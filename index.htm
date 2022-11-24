@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width initial-scale=1">
+  <meta name="google-site-verification" content="7tTF0t5uCMnyE6X31OIOQpcOf4QxWuODtyZLoVsKCEc" />
+  <meta name="msvalidate.01" content="7FC9C7BCD4002EBD89AAC2EF63D7B353" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <meta http-equiv="Cache-Control" CONTENT="max-age=60, must-revalidate">
+  <title>Advent Calendar 2022</title>
+  <meta name="description" content="Advent Calendar 2022 on native Web technologies.">
+  <link href="./advent2022.css" rel="stylesheet" Content-Type="text/css" media="screen" />
+  <style>
+    .calendar {
+      background-image: url(advent-candles.jpg);
+      background-size: cover;
+      background-position: center;
+      padding: 2rem;
+      display: grid;
+      width: 100%;
+      max-width: 740px;
+      margin: auto;
+
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto;
+      grid-gap: 1rem;
+      grid-template-areas:
+        "--1 d08 d15 d10"
+        "--- --- d22 d20"
+        "--- --- d06 d03"
+        "--- --- d13 d17"
+        "d02 d12 d07 d01"
+        "d16 d04 d14 d09"
+        "d19 d24 d24 d18"
+        "d21 d23 d05 d11";
+    }
+
+    .calendar>a,
+    .calendar>a:visited {
+      display: inline-block;
+      box-sizing: border-box;
+      border: transparent 0.2rem dotted;
+      width: 100%;
+      height: 4.4rem;
+      background: #85090B80;
+      border-radius: 1rem;
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 1rem;
+      color: transparent;
+      text-decoration: none;
+    }
+
+    .calendar>a:hover {
+      color: white;
+      border: white 0.2rem dotted;
+      background: #85090B80;
+    }
+
+    .calendar>a[href] {
+      color: gold;
+    }
+
+    a#fork {
+      position: absolute;
+      display: inline-block;
+      top: 4px;
+      left: 20px;
+      background: #203050;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      font-weight: normal;
+      padding: 2px 16px;
+      font-size: 1rem;
+      line-height: 1.4rem;
+      transition: 0.4s;
+      box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8);
+
+    }
+
+    a#fork:hover {
+      background: #1A4425;
+    }
+
+    @media screen and (min-width:800px) {
+
+      /* rotate and resize */
+      a#fork {
+        left: -68px;
+        top: 36px;
+        padding: 5px 60px;
+        line-height: 2rem;
+        transform: rotate(-45deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>Advent Calendar 2022 on native Web technologies</h1>
+    <p>This year I again collected intersting JavaScript snippets and less known features
+      that are available in the native browser.</p>
+
+    <div class="calendar">
+      <a style="grid-area:d01" xhref="">1</a>
+      <a style="grid-area:d02" xhref="">2</a>
+      <a style="grid-area:d03" xhref="">3</a>
+      <a style="grid-area:d04" xhref="">4</a>
+      <a style="grid-area:d05" xhref="">5</a>
+      <a style="grid-area:d06" xhref="">6</a>
+      <a style="grid-area:d07" xhref="">7</a>
+      <a style="grid-area:d08" xhref="">8</a>
+      <a style="grid-area:d09" xhref="">9</a>
+      <a style="grid-area:d10" xhref="">10</a>
+      <a style="grid-area:d11" xhref="">11</a>
+      <a style="grid-area:d12" xhref="">12</a>
+      <a style="grid-area:d13" xhref="">13</a>
+      <a style="grid-area:d14" xhref="">14</a>
+      <a style="grid-area:d15" xhref="">15</a>
+      <a style="grid-area:d16" xhref="">16</a>
+      <a style="grid-area:d17" xhref="">17</a>
+      <a style="grid-area:d18" xhref="">18</a>
+      <a style="grid-area:d19" xhref="">19</a>
+      <a style="grid-area:d20" xhref="">20</a>
+      <a style="grid-area:d21" xhref="">21</a>
+      <a style="grid-area:d22" xhref="">22</a>
+      <a style="grid-area:d23" xhref="">23</a>
+      <a style="grid-area:d24" xhref="">24</a>
+    </div>
+
+
+    <p>Most of them are from working on my OpenSource projects
+      and I also discovered some less useful things
+      that I think are interesting to know.</p>
+
+    <p>All 24 entries come with brief documentation and full functional implementations.
+      You may use the Developer Tools (F12) to discover details yourself.</p>
+
+    <h2>See Also</h2>
+
+    <ul>
+      <li><a href="https://mathertel.github.io/advent2021/index.htm">Advent Calendar 2021</a></li>
+      <li><a href="about.htm">About this project, disclaimer, legal</a></li>
+      <li>Source-code is available on GitHub:<a href="https://github.com/mathertel/advent2022">https://github.com/mathertel/advent2022</a></li>
+    </ul>
+
+    <h2>Used Tags</h2>
+
+    <div class="taglist">
+      <a href="tag-css.htm">CSS</a>
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+
+  </main>
+  <a id="fork" href="https://github.com/mathertel/advent2022">Fork me on GitHub</a>
+</body>
+
+</html>
