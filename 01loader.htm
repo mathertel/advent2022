@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>CSS only loading progress indicator, loader</title>
+  <meta name="description" content="A css only loading progress indicator">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <!-- <script src="./advent2022.js" defer></script> -->
+
+  <style>
+    .loader {
+      position: fixed;
+      width: 5em;
+      height: 5em;
+      left: calc(50% - 2.5em);
+      top: calc(50% - 2.5em);
+      z-index: 99;
+      border: 1em solid currentColor;
+      border-bottom-color: transparent;
+      border-radius: 50%;
+      animation: turn 1s linear infinite;
+    }
+    @keyframes turn {0% {transform: rotate(0);}100% {transform: rotate(1turn);}}
+  </style>
+</head>
+
+<body>
+  <div class="loader"></div>
+
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>CSS only loading progress indicator, loader</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>Robust low-code implementation of a loader.</p>
+    </fieldset>  
+  
+    <p>Implementing a loading indicator is required when web application need
+      a long time to load and start executing in the browser.
+      One topic that is special to loading indicators is that they
+      must show up even before the page is loaded completely.</p>
+
+    <h2>Implementing a loader</h2>
+
+    <p>Loaders must appear as soon as possible to make the visitor aware
+      of ongoing loading or ongoing backend service calls.</p>
+
+    <p>Using a HTML Object that is located near the start of the page, in-page CSS
+      and avoiding any external dependencies like external style sheets,
+      image files or external scripting is the best option to achieve this.
+
+      This version of a loader doesn't use javascript to be shown
+      but javascript must be used to stop the loader after loading has been done.</p>
+
+    <p>There are many solutions described on how to implement a loader
+      showing that users must wait. One of the smaller implementations using
+      css <code>calc()</code> function for positioning and css transform animation
+      for the spinning symbol is used here.</p>
+
+    <p>This avoids that loading an image is required before showing the loader.</p>
+
+
+    <h3>HTML code</h3>
+
+    <p>The HTML code should be the first code after the opening body element:</p>
+
+    <pre><code>&lt;div class=&quot;loader&quot;&gt;&lt;/div&gt;</code></pre>
+
+
+    <h3>CSS code</h3>
+
+    <pre><code>.loader {
+  position: fixed;
+  width: 5em;
+  height: 5em;
+  left: calc(50% - 2.5em);
+  top: calc(50% - 2.5em);
+  border: 1em solid currentColor;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: turn 1s linear infinite;
+}
+
+@keyframes turn {
+  0% {transform: rotate(0);}
+  100% {transform: rotate(1turn);}
+}</code></pre>
+
+    <h3>Scripting code</h3>
+
+    <p>To remove the loader after the page is fully loaded some script is needed:</p>
+
+    <pre><code>window.addEventListener("load", async (e) => {
+  document.querySelector(".loader").style.display = "none";
+});</code></pre>
+
+    <h3>Example</h3>
+
+    <p>A large picture to show slow loading. is below. You can use the developer tools in the browser to enable some throttling
+      so the picture will be loaded and you can see that the progress indicator is removed
+      after the picture is fully available.
+    </p>
+    <img src="01time.jpg" alt="time consuming" style="height:360px">
+
+    <h2>See Also</h2>
+    <ul>
+      <li><a href="https://www.sliderrevolution.com/resources/css-loaders/">https://www.sliderrevolution.com/resources/css-loaders/</a></li>
+      <li><a href="https://elad.medium.com/css-position-sticky-how-it-really-works-54cd01dc2d46">https://elad.medium.com/css-position-sticky-how-it-really-works-54cd01dc2d46</a></li>
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-javascript.htm">JavaScript</a>
+      <a href="tag-css.htm">CSS</a>
+    </div>
+
+  </main>
+  <script>
+    async function timeout(ms = 1000) {
+      await new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    document.addEventListener("DOMContentLoaded", async (e) => {
+      console.info("document=>DOMContentLoaded event");
+    })
+
+    window.addEventListener("load", async (e) => {
+      console.info("window=>load event");
+      await timeout(800);
+      document.querySelector(".loader").style.display = "none";
+      console.info("loader done.");
+    });
+
+  </script>
+</body>
+
+</html>
