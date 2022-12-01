@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Copy Sourcecode to Clipboard</title>
+  <meta name="description" content="support clipboard on code blocks">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <style>
+    pre code {
+      position: relative;
+    }
+
+    pre code:hover::after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 32px;
+      height: 32px;
+      content: "";
+      background-repeat: no-repeat;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M30 36v6H6V18v0h6m6-12h24v24H18z' fill='none' stroke='black' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Copy Sourcecode to Clipboard</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>Enable copying source code snippets to the clipboard.</p>
+    </fieldset>
+
+    <p>In educative web pages source code is often an integrated part, as it is also here.</p>
+
+    <p>Providing a copy to clipboard function on code blocks was always on my list and now is part of this advent calendar.</p>
+
+    <p>Adding the functionality to a pre-code block can be done automatically.</p>
+
+    <h2>Writing text to the clipboard</h2>
+
+    <p>The core functionality is using the writeText function of the navigator.clipboard:</p>
+
+    <pre><code>navigator.clipboard.writeText(text);</code></pre>
+
+
+    <h2>Copy To Clipboard Icon</h2>
+
+    <p>A common icon can be used using the following svg code:</p>
+
+    <pre><code>&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 48 48&quot;&gt;
+  &lt;path d=&quot;M30 36 v 6 H 6 V 18 v 0 h 6 m 6-12 h 24 v 24 H 18 z&quot;
+  fill=&quot;none&quot; stroke=&quot;#000&quot;
+  stroke-width=&quot;4&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; /&gt;
+&lt;/svg&gt;</code></pre>
+
+    <p>To show this icon when the cursor hovers the source code it can be
+      included inline into css using the rule without using javascript events:</p>
+
+    <pre><code>pre code {
+  position: relative;
+}
+
+pre code:hover::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  content: "";
+  background-repeat: no-repeat;
+  background-image: url("data:image/svg+xml;utf8,&lt;svg ...&gt;");
+}</code></p></pre>
+
+
+    <h2>Click to Copy Event</h2>
+
+    <p>This function can be used in a click event
+      to write the inner text of the code tag to the clipboard
+      when the copy icon in the upper right corner has been clicked:</p>
+
+    <pre><code>function codeCopy(evt) {
+  const t = evt.target;
+  const box = t.getBoundingClientRect();
+  if ((evt.clientX > box.right - 32) && (evt.clientY < box.top + 32)) {
+    navigator.clipboard.writeText(t.innerText);
+  }
+}</code></pre>
+
+    <p>This function can be attached to all <code>pre &gt; code</code> elements
+      using the following code:</p>
+
+    <pre><code>document.querySelectorAll('pre code').forEach(e => {
+  e.addEventListener('click', codeCopy);
+});</code></pre>
+
+
+    <h2>See also</h2>
+
+    <ul>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Clipboard">https://developer.mozilla.org/en-US/docs/Web/API/Clipboard</a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect">https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect</a></li>
+    </ul>
+
+  </main>
+  <script>
+    function codeCopy(evt) {
+      const t = evt.target;
+      const box = t.getBoundingClientRect();
+      if ((evt.clientX > box.right - 32) && (evt.clientY < box.top + 32)) {
+        console.log(t.innerText);
+        navigator.clipboard.writeText(t.innerText);
+      }
+    }
+    document.querySelectorAll('pre>code').forEach(e => {
+      e.addEventListener('click', codeCopy);
+    });
+  </script>
+</body>
+
+</html>

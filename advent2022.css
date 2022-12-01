@@ -20,7 +20,7 @@ main {
   width: 600px;
   max-width: 600px;
   margin: 0 auto;
-  padding-top: 2rem;
+  padding: 2rem 0;
 }
 
 *,
@@ -63,8 +63,20 @@ code {
   padding: 0 0.2em;
 }
 pre > code {
+  position: relative;
   display: block;
   padding: 0.4em;
+}
+
+pre > code:hover::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  content: "";
+  background-repeat: no-repeat;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M30 36v6H6V18v0h6m6-12h24v24H18z' fill='none' stroke='black' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 }
 
 a, a:hover, a:visited {
