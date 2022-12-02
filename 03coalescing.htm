@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Implementing default values for function parameters</title>
+  <meta name="description" content="Overview off the mechanisms for default values in function parameters">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <style>
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Implementing default values for function parameters</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>Overview off the mechanisms for default values in function parameters.</p>
+    </fieldset>
+
+    <p>I have seen many different implementations to handle default parameters or default values using different mechanisms
+      for parameters on functions. Since some years JavaScript supports default values for function parameters.
+      Here you see the difference on all 3 methods as overview.
+    </p>
+
+    <p>The example will assign a default value of 100 in case ...</p>
+
+    <h2>Using the logical OR operator</h2>
+
+    <p>This kind-of old style implementation using the logical OR operator.</p>
+
+    <pre><code>// use the OR operator for assigning a default value.
+function waittimeOR(duration) {
+  const d = duration || 100;
+  return (d);
+}</code></pre>
+
+    <h2>Using the coalescing operator</h2>
+
+    <p>This operator ...</p>
+
+    <pre><code>// use the coalescing operator for assigning a default value.
+function waittimeCO(duration) {
+  const d = duration ?? 100;
+  return (d);
+}</code></pre>
+
+
+    <h2>Using the function default values</h2>
+
+    <p>This mechanism is extending the javascript function declaration syntax by using a ...</p>
+
+    <pre><code>// use the coalescing operator for assigning a default value.
+function waittimeP(duration = 100) {
+  const d = duration;
+  return (d);
+}</code></pre>
+
+    <h2>Results</h2>
+
+    <p>These are the raw results from the 3 functions above when using the input parameter:</p>
+
+    <pre><code id="prot">(input)   -- (waittimeOR), (waittimeCO), (waittimeP)
+</code></pre>
+
+    <p>Using the <b>OR operator</b> shows problematic when using "falsy" values like a numeric value of '0'.
+      Also paramters are treaded different when passed as strings or as numbers.</p>
+
+    <p>The <b>coalescing operator</b> is handling these cases better
+      as it has a better understanding of "given value" that also fits to defaulting falsy parameters.
+      Still `null` parameters are treated like `undefined` parameters.</p>
+
+    <p>Using default assignments in the function definition handles `null` parameters different. Here a given `null` value is treated
+      like any given value of another type.</p>
+
+    <h2>Summary</h2>
+
+    <p>The mechanism to use for default parameters has to be chosen wisely based on the datatype you expect.
+      The OR method might be good for boolean inputs.
+      If you have explicit `null` value cases the default assignments in the function definitions
+      are the best to be used.
+    </p>
+
+    <p>
+      As a general rule check that you don't mix `null`and `undefined` use-cases.
+      Using typescript will warn you as these values also differ by the type definitions.
+      However it will not be checked at runtime.
+    </p>
+
+    <h2>See also</h2>
+
+    <ul>
+      <li><a href="https://atomizedobjects.com/blog/javascript/nullish-coalescing-vs-or-javascript-operators/">
+          https://atomizedobjects.com/blog/javascript/nullish-coalescing-vs-or-javascript-operators/</a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters">
+          https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters</a></li>
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+  </main>
+
+  <script>
+    // 
+
+    const prot = document.querySelector('#prot');
+
+    // use the OR operator for assigning a default value.
+    function waittimeOR(duration) {
+      const d = duration || 100;
+      return (d);
+    }
+
+    // use the coalescing operator for assigning a default value.
+    function waittimeCO(duration) {
+      const d = duration ?? 100;
+      return (d);
+    }
+
+    // use the coalescing operator for assigning a default value.
+    function waittimeP(duration = 100) {
+      const d = duration;
+      return (d);
+    }
+
+    function testcase(p) {
+      prot.append(`${(String(p)+"        ").slice(0,9)} -- \t${waittimeOR(p)}, \t      ${waittimeCO(p)}, \t    ${waittimeP(p)}\n`);
+
+    }
+
+    testcase("xx");
+    testcase(33);
+    testcase(false);
+    testcase("0");
+    testcase(0);
+    testcase(null);
+    testcase();
+
+  </script>
+</body>
+
+</html>
