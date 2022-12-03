@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Create Random Colors</title>
+  <meta name="description" content="Create Random Colors">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <style>
+    .coldemo {
+      display: inline-block;
+      transition: all 0.6s;
+      width: 80px;
+      height: 80px;
+      border: black 2px solid
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Create Random Colors</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>Create a random color value in JavaScript</p>
+    </fieldset>
+
+    <p>This essay was implemented while exploring some color functions - no real serious use-case but for some fun.</p>
+
+      <p>Generating random colors algorithms are available in many articles.
+      Here is a summary on some functions that have different color effects.</p>
+
+    <h3>Bright colors</h3>
+
+    <p>When you need bright colors the hsl notation for colors can be used by specifying a fixed
+      saturation and lightness ond only vary the hue factor. You can use this for dark and light colors as well.</p>
+
+    <pre><code>  brightColorValue = `hsl(${Math.floor(Math.random() * 256)}, 100%, 50%)`;
+  lightColorValue = `hsl(${Math.floor(Math.random() * 256)}, 100%, 75%)`;
+  darkColorValue = `hsl(${Math.floor(Math.random() * 256)}, 100%, 25%)`;</code></pre>
+
+    <span id="col2" class="coldemo" style="color: black;">bright</span>
+    <span id="col3" class="coldemo" style="color: black;">light</span>
+    <span id="colDark" class="coldemo" style="color: white;">dark</span>
+
+    <h3>Dark colors</h3>
+
+    <h3>All colors</h3>
+
+    <pre><code>const colValue =
+  '#' + 
+  ('000000' + Math.floor(Math.random() * 0x1000000).toString(16))
+  .slice(-6);</code></pre>
+
+    <span id="col1" class="coldemo" style="color: black;">all</span>
+
+
+    <h2>See also</h2>
+
+    <ul>
+      <li>HSL Color Calculator <a href="https://www.w3schools.com/colors/colors_hsl.asp">https://www.w3schools.com/colors/colors_hsl.asp</a></li>
+    </ul>
+
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+      <a href="tag-css.htm">CSS</a>
+    </div>
+  </main>
+
+  <script>
+    function randomColor1() {
+      // format correctly by using hex format and filling '0's;
+      const colValue = '#' + ('000000' + Math.floor(Math.random() * 0x1000000).toString(16)).slice(-6);
+      return (colValue);
+    }
+
+    function randomBrightColor() {
+      // format correctly by using hex format and filling '0's;
+      const colValue = `hsl(${Math.floor(Math.random() * 256)}, 100%, 50%)`;
+      return (colValue);
+    }
+
+    function randomLightColor() {
+      // format correctly by using hex format and filling '0's;
+      const colValue = `hsl(${Math.floor(Math.random() * 256)}, 100%, 75%)`;
+      return (colValue);
+    }
+
+    function randomDarkColor() {
+      // format correctly by using hex format and filling '0's;
+      const colValue = `hsl(${Math.floor(Math.random() * 256)}, 100%, 25%)`;
+      return (colValue);
+    }
+
+    window.setInterval(() => {
+      document.querySelector('#col1').style.backgroundColor = randomColor1();
+      document.querySelector('#col2').style.backgroundColor = randomBrightColor();
+      document.querySelector('#col3').style.backgroundColor = randomLightColor();
+      document.querySelector('#colDark').style.backgroundColor = randomDarkColor();
+    }, 800);
+
+  </script>
+</body>
+
+</html>
