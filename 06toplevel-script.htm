@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <title>Top Level Scripting</title>
+  <meta name="description" content="Overview off the mechanisms for default values in function parameters">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <style>
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Top Level Scripting</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>How to implement the code that is required while loading the page
+        and how to avoid blocking.</p>
+    </fieldset>
+
+    <p>Implementing JavaScript functions in an simple <code>&lt;script&gt;</code> tag
+      can be seen is many examples in the web as it it quiet simple to do and works in many situations.
+      I also do it here in many examples.</p>
+
+    <p>But sometimes it fails and sometimes it blocks.</p>
+
+    <p>So here is a short summary about code you have to avoid, about
+      conflicts and side effects within global scripts.</p>
+
+
+    <h2>Conflicts in Global Variables </h2>
+
+    <p>By defining a variable inside a <code>&lt;script&gt;</code> tag the variable is in the global space.
+      Nothing bad with this but is may occur that writing another script is by accident
+      using the same name and the you will have a conflict that is hard to identify.</p>
+
+    <p>A possible solution to this is to define variables inside a function scope
+      that makes it availabe to your page scripts but separates them from
+      other scripts and components.</p>
+
+    <p>Here is an example that defines a function with inner variables that is
+      instantly called. Everything inside the function behaves mostly exactly the same way
+      but functions and variables are not visible to the outside.</p>
+
+    <pre><code>(function () {
+  console.info('startup:');
+
+  let lastElementClicked = undefined;
+
+  document.addEventListener("click", (e) => {
+    lastElementClicked = e.target;
+    console.info("last clicked:", lastElementClicked);
+  });
+})();</code></pre>
+
+    <p>As a side effect encapsulating variables and functions this way
+      also allows a script minifier to used shorter variable names
+      without creating problems as they are not known to the outside.</p>
+
+
+    <h2>Long Running tasks - fails</h2>
+
+    Coding long running things here is freezing the page and must be avoided
+    as demonstrated by the following script:</p>
+
+    <pre><code>// blocking count-down script
+for (let n1 = 10; n1 >= 0; n1--) {
+  for (let sd = Date.now(); Date.now() &lt; sd+1000;) { }
+    document.title = `wait for ${n1} secs.`;
+    console.info("countdown:", n1);
+  }
+}</code></pre>
+
+    <p>In this script there is no pause implemented as the starting and current time
+      is permanently checked causing HIGH cpu consumption as well.</p>
+
+    <p>You can activate this script in this page by a
+      <a href="?countdown">?countdown</a> parameter to the page url.
+      The title and caption of the browser tab will be changed every second
+      but the page will be visible only after the countdown is over.
+    </p>
+
+
+    <h2>Long Running tasks in async functions - fails</h2>
+
+    <p>There is a "trick" described in some examples on the internet
+      to start a async function that wraps the long running task.
+      However this doesn't work either when there is a blocking script
+      that doesn't use promises or callbacks at all:</p>
+
+    <pre><code>// blocking async function
+(async function () {
+  for (let n1 = 10; n1 >= 0; n1--) {
+    for (let sd = Date.now(); Date.now() &lt; sd + 1000;) { }
+    console.info("countasync:", n1);
+    document.title = `wait for ${n1} secs.`;
+  }
+})();</code></pre>
+
+    <p>You can activate this script in this page by adding a
+      <a href="?countasync">?countasync</a> parameter to the page url.
+      Again the title and caption of the browser tab will be changed every second
+      but the page will be visible only after the countdown is over.
+    </p>
+
+
+    <h2>Top Level Promises - fails</h2>
+
+    <p>In an global script it is not possible to use the <code>await</code> keyword to resolve promises.
+      The following script will just not work:</p>
+
+    <pre><code>// the following code will cause a scripting error:
+const r = await fetch('muchdata.json');</code></pre>
+
+    <p>You will see an error like:</p>
+
+    <pre style="color:red">Uncaught SyntaxError: await is only valid in async functions
+    and the top level bodies of modules</pre>
+
+    <p>The reason for this is quiet obvious: Long running activities are not wanted
+      and thats what a waiting for a Promise result using await in a global script actually is.</p>
+
+    <p>So we cant wait, but we can start a asynchronous task. Callbacks and Promises are your friends:</p>
+
+
+    <h2>Async functions with callbacks - works</h2>
+
+    <p>So instead of constantly checking the time it is possible to wait for a timer
+      to call back and wrap this in a Promise. This will allow the JavaScript execution
+      to collaboratively execute multiple threads in parallel:</p>
+
+    <pre><code>// Promise and Timer used for waiting
+function WaitPromise(milliSeconds) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(resolve, milliSeconds);
+  });
+}
+
+if (location.search.includes('counttimer')) {
+  (async function () {
+    for (let n1 = 10; n1 &gt;= 0; n1--) {
+      await WaitPromise(1000);
+      console.info("counttimer:", n1);
+      document.title = `wait for ${n1} secs.`;
+    }
+  })();
+}</code></pre>
+
+    <p>You can activate this script in this page by adding a
+      <a href="?counttimer">?counttimer</a> parameter to the page url.
+      The page will load completely and is not freezing and the countdown
+      in the title will work in parallel.
+    </p>
+
+    <h2>Wait for the page beeing loaded</h2>
+
+    <p>However some things don't work as top-level scripts are executed before the document
+      is ready and especially before external scripts and modules are loaded.</p>
+
+    <p>As you already have everything wrapped in a function it is just required to control
+      when it is called.</p>
+
+    <p>The events from the window object <code>load</code> or <code>DOMContentLoaded</code>
+      can do the trick. So why not delay all top level scripts up to this moment ?</p>
+
+    <p>It is the same inner code, but now executed after all documents have been loaded.</p>
+
+    <pre><code>if (location.search.includes('countloaded')) {
+  window.addEventListener("DOMContentLoaded",
+    async (e) => {
+      for (let n1 = 10; n1 &gt;= 0; n1--) {
+        await WaitPromise(1000);
+        console.info("countloaded:", n1);
+        document.title = `wait for ${n1} secs.`;
+      }
+    });
+}</code></pre>
+
+    <p>You can activate this script in this page by adding a
+      <a href="?countloaded">?countloaded</a> parameter to the page url.
+      You will not see much difference to the previous script
+      but the whole DOM is available and initialized.
+    </p>
+
+    <p>Wrapping anything that may run longer or depends on network calls
+      should be embedded in this way into a async function that gets started by the
+      DOMContentLoaded event and avoid any active waiting but used Promises.
+      Using functions like <code>fetch</code> will fit into this as well.</p>
+
+
+    <h2>Wait for loaded</h2>
+
+    <p>However some things don't work as top-level scripts are executed before the document
+      is ready and especially before external scripts and modules are loaded.</p>
+
+    <p>As you already have everything wrapped in a function it is just required to controll when it is called.</p>
+
+    <p>The events from the window object <code>load</code> or <code>DOMContentLoaded</code>
+      can do the trick. So Why not delay all top level scripts up to this moment ?</p>
+
+    <p>It is the same inner code, but now executed after all documents have been loaded.</p>
+
+    <pre><code>window.addEventListener("DOMContentLoaded", (e) => {
+      console.info('Starting...');
+  let lastElementClicked = undefined;
+  document.addEventListener("click", (e) => {
+    lastElementClicked = e.target;
+    console.info("last clicked:", lastElementClicked);
+  });
+});</code></pre>
+
+
+    <h2>See in action...</h2>
+
+    <p>Use the links:</p>
+    <ul>
+      <li><a href="?countdown">?countdown</a> blocking in global script,</li>
+      <li><a href="?countasync">?countasync</a> blocking in async function,</li>
+      <li><a href="?counttimer">?counttimer</a> non-blocking using async and timer based callbacks. </li>
+      <li><a href="?countloaded">?countloaded</a> same ... after document fully loaded.</li>
+    </ul>
+    <p> see the behavior of the blocking and working scripts.
+      You can use the Developer Tools (F12) and have a look to the console output of the scripts
+      you can find inside this page. Happy debugging...
+    </p>
+
+
+    <h2>See also</h2>
+
+    <ul>
+      <li><a href="https://v8.dev/features/top-level-await">https://v8.dev/features/top-level-await</a></li>
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+  </main>
+
+  <script>
+    console.info('Global:', 'Starting...');
+    window.addEventListener('DOMContentLoaded', (e) => console.info('DOMContentLoaded.', document));
+    window.addEventListener('load', (e) => { console.info('loaded.'); });
+
+    // Promise and Timer used for waiting
+    function WaitPromise(milliSeconds) {
+      return new Promise(function(resolve, reject) {
+        setTimeout(resolve, milliSeconds);
+      });
+    }
+
+    if (location.search.includes('countdown')) {
+      for (let n1 = 10; n1 >= 0; n1--) {
+        for (let sd = Date.now(); Date.now() < sd + 1000;) { /* wait ? */ }
+        console.info('countdown:', n1);
+        // document.writeln(`<div>wait for ${n1} secs.</div>`);
+        document.title = `wait for ${n1} secs.`;
+      }
+    }
+
+    if (location.search.includes('countasync')) {
+      (async function() {
+        for (let n1 = 10; n1 >= 0; n1--) {
+          for (let sd = Date.now(); Date.now() < sd + 1000;) { /* wait ? */ }
+          console.info('countasync:', n1);
+          // document.writeln(`<div>wait for ${n1} secs.</div>`);
+          document.title = `wait for ${n1} secs.`;
+        }
+      })();
+    }
+
+    if (location.search.includes('counttimer')) {
+      (async function() {
+        for (let n1 = 10; n1 >= 0; n1--) {
+          await WaitPromise(1000);
+          console.info('counttimer:', n1);
+          document.title = `wait for ${n1} secs.`;
+        }
+      })();
+    }
+
+    if (location.search.includes('countloaded')) {
+      window.addEventListener('DOMContentLoaded',
+        async(e) => {
+          for (let n1 = 10; n1 >= 0; n1--) {
+            await WaitPromise(1000);
+            console.info('countloaded:', n1);
+            document.title = `wait for ${n1} secs.`;
+          }
+        });
+    }
+
+    console.info('Global:', 'end.');
+  </script>
+
+
+</body>
+
+</html>
