@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Standard console.logging</title>
+  <meta name="description" content="">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
+  <style>
+    .cheatSheet {
+      border: 2px solid gray;
+      padding: 0.5rem;
+      background-color: #eeeeee;
+    }
+
+    table.cheat {
+      border-collapse: collapse;
+    }
+
+    table.cheat td[colspan] {
+      padding-top: 0.5rem
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loader"></div>
+
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Use standard console logging</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>Using console logging is often seen as a bad implementation behavior. But it isn't so bad.
+        And there are options for customization.</p>
+    </fieldset>
+
+    <p>So here is a primer to use the standard logging features in the browser defined by the standards.
+      When implementing applications based on the standard browser the application can follow the standard
+      by using the given functions and levels of logging defined by the console element.</p>
+
+    <p>There are some libraries available for javascript but are made to run server side in nodejs like
+      <a href="https://github.com/winstonjs/winston">winston</a> or
+      <a href="https://github.com/trentm/node-bunyan">bunyan</a>.
+      They make a good job there and the size of the code doesn't count much there.
+    </p>
+
+    <p>Some also support client side logging like
+      <a href="https://github.com/pimterry/loglevel">loglevel</a> or
+      <a href="https://github.com/debug-js/debug">debug</a>
+      but they introduce different APIs than the standard console.
+    </p>
+
+    <p>Here and in 2 following advent stories I will show how to stick to the standard for in-browser logging
+      and adding features when required.</p>
+
+
+    <h2>Standard console features</h2>
+
+    <p>There is more that just console.log().
+      This is a short summary of the featured given by the console as a cheatsheet:</p>
+
+    <div class="cheatSheet">
+      <table class="cheat">
+
+        <tr>
+          <td colspan="2"><b>Logging</b></td>
+        </tr>
+        <tr>
+          <td>debug(log-data)</td>
+          <td>logging data (verbose)</td>
+        </tr>
+        <tr>
+          <td>log(log-data)</td>
+          <td>logging data (info)</td>
+        </tr>
+        <tr>
+          <td>info(log-data)</td>
+          <td>logging data (info)</td>
+        </tr>
+        <tr>
+          <td>trace(log-data)</td>
+          <td>logging data(info) + stack-trace</td>
+        </tr>
+        <tr>
+          <td>error(log-data)</td>
+          <td>logging data(error) + stack-trace</td>
+        </tr>
+        <tr>
+          <td>warn(log-data)</td>
+          <td>logging data(warning) + stack-trace</td>
+        </tr>
+
+        <tr>
+          <td>clear()</td>
+          <td>clear the log. Clear counters.<br>Maybe gets prevented due user settings</td>
+        </tr>
+
+
+        <tr>
+          <td colspan="2"><b>Logging data</b></td>
+        </tr>
+
+        <tr>
+          <td>dir(log-data)</td>
+          <td>logging the DOM element(info)</td>
+        </tr>
+        <tr>
+          <td>dirxml(log-data)</td>
+          <td>logging outer HTML/XML(info)</td>
+        </tr>
+        <tr>
+          <td>table(log-data)</td>
+          <td>logging array as table(info)</td>
+        </tr>
+
+
+        <tr>
+          <td colspan="2"><b>Code Analysis support</b></td>
+        </tr>
+
+        <tr>
+          <td>count(label)</td>
+          <td>increment and print counter</td>
+        </tr>
+        <tr>
+          <td>countReset(label)</td>
+          <td>reset specific counter</td>
+        </tr>
+
+        <tr>
+          <td>time(label)</td>
+          <td>start a timer</td>
+        </tr>
+        <tr>
+          <td>timeLog(label, log-data)</td>
+          <td>print timer with optional data</td>
+        </tr>
+        <tr>
+          <td>timeEnd(label)</td>
+          <td>print timer and stop</td>
+        </tr>
+
+        <tr>
+          <td colspan="2"><b>Log formatting</b></td>
+        </tr>
+
+        <tr>
+          <td>group(label)</td>
+          <td>start a group and indent logs</td>
+        </tr>
+        <tr>
+          <td>groupCollapsed(label)</td>
+          <td>start a group unexpanded</td>
+        </tr>
+        <tr>
+          <td>groupEnd()</td>
+          <td>reduce indenting</td>
+        </tr>
+
+        <tr>
+          <td colspan="2"><b>Assertions</b></td>
+        </tr>
+        <tr>
+          <td>assert(true, log-data)</td>
+          <td>does not appear in console assuming everything is ok.</td>
+        </tr>
+        <tr>
+          <td>assert(false, log-data)</td>
+          <td>will stop in debugger with stack trace</td>
+        </tr>
+
+      </table>
+    </div>
+
+    <p><b>log-data</b> &ndash; a list of values to be logged. First argument can contain placeholders</p>
+    <p><b>no return values</b></p>
+
+    <p>The browser supports 4 logical levels of logging severity:</p>
+
+    <ul>
+      <li>verbose &ndash; all generic logging</li>
+      <li>info &ndash; informative logging</li>
+      <li>warning &ndash; warning to the user (/developer)</li>
+      <li>error &ndash; error to the user (/developer)</li>
+    </ul>
+
+    <h2>Controlling the shown log in the browser</h2>
+
+    <p>Most browsers support filtering the generated console output using a filter string and by selecting the shown levels.</p>
+    <p>The console is always populated completely and these filters apply before showing the logged content.</p>
+
+    <h2>Example</h2>
+
+    <p>In the script of this page you can find several logging functions for testing and inspecting the
+      way it works. Here some examples:</p>
+
+    <h2>Best practices (my ...)</h2>
+
+    <p><strong>Use a prefix</strong> &ndash; The first parameter may contain the log reason including a meaningful prefix.
+      This allows easy filtering.</p>
+
+    <p><b><strong>info</strong> &ndash; </b>Use info(...) for logging on the activity level as a standard.</p>
+
+    <p><b><strong>debug</strong> &ndash; </b>Use debug(...) for temporary detailled developing aid. As you can see from the api above
+      the <code>debug</code> function is the one that can be used for verbose debugging and can be switched off
+      in the console. When you have to analyze a problem use <code>debug</code> for the detailled level and use <code>info</code> for the oversight.</p>
+
+    <p><strong>assert</strong> &ndash; The <code>assert</code> function can be used to
+      conditionally stop in the debugger and start detailled analysis from this time on.</p>
+
+    <p><strong>Clone objects</strong> &ndash; whenever you have to log a object that changes over time and you need to expand for detailled analysis
+      be sure to clone the object somehow to log the actual values and not show the latest values when expanding. There is a sequence in the examples illustrating this.</p>
+    <p>Cloning a object (first level) is easy by using <code>console.log({ ...pObj });</code></p>
+
+
+    <h2>See Also</h2>
+    <ul>
+      <li>On a next day we will see how to create a filter <b>before</b> sending text to the console.</li>
+      <li>On a next day we will see how to show loggin on the page instead of the console window.</li>
+      <li><a href="https://console.spec.whatwg.org/#logger">https://console.spec.whatwg.org/#logger</a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/console">https://developer.mozilla.org/en-US/docs/Web/API/console</a></li>
+      <li><a href="https://stackify.com/javascript-logging-basic-tips/">https://stackify.com/javascript-logging-basic-tips/</a></li>
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+
+  </main>
+  <script>
+    console.clear(); // clear the log or show "console.clear() was prevented due to 'Preserve log'"
+
+    console.time("global script");
+
+    // simple logging of text and parameters
+    const pObj = {
+      key: "k", value: 42
+    };
+
+    // simple data
+    const pData = [
+      { id: 1233, firstname: "Jack", lastname: "Builder", profession: "stonemason" },
+      { id: 1235, firstname: "Ellen" },
+      { id: 1299, firstname: "Philip", profession: "prior" },
+      { id: 1299, firstname: "Richard ", lastname: "of Kingsbridge", profession: "knight" }
+      , 42
+    ];
+
+    console.debug("debug test (verbose level)", pObj);
+
+    console.group("info functions");
+    console.log("test:log (info level)", pObj);
+    console.trace("test:trace (info level)", pObj);
+
+    console.assert(true, "test:assert-true", pObj);   // will not appear in console as everythin is ok.
+    // console.assert( false, "info assert-false", pObj); // will stop in debugger with stack trace
+    // console.assert( false, "info assert-false <%s>", pObj.key);
+
+    console.info("test:info (info level)", pObj);
+    console.info("test:formatted string %s", pObj);
+    console.info("test:formatted %%s %s", 966.5);
+    console.info("test:formatted %%d %d", 966.5);
+    console.info("test:formatted %%i %i", 966.5);
+    console.info("test:formatted %%f %f", 966.5);
+    console.info("test:formatted %%o %o", 966.5);
+    console.info("test:formatted %%o %o", pObj);
+    console.info("test:formatted %%c for CSS: %c GREEN %c RED", "color:green", "color:red");
+    console.groupEnd();
+
+    console.error("test:error (error level)", pObj);
+    console.warn("test:warn (warning level)", pObj);
+
+    console.group("COUNT");
+    console.count();
+    console.count();
+    console.count("LAB");
+    console.count("LAB");
+    console.count("LAB");
+    console.count();
+    console.countReset("LAB")
+    console.count("LAB");
+    console.groupEnd();
+
+    // Be aware that the initial logging of the object may differ from the value when expanding the object 
+    console.log("obj:", JSON.stringify(pObj)); // Object as string -> will not be changed on expansion
+    console.log("obj:", Object.assign({}, pObj)); // Copy of Object -> top level will not be changed on expansion
+    console.log("obj:", { ...pObj }); // Copy of Object -> top level will not be changed on expansion
+    console.log("obj:", pObj); // output the object Element
+    pObj.value++;
+    console.log("obj:", pObj); // again, but changed
+    pObj.value++;
+    // See in the console:
+
+    console.groupCollapsed("test:data functions");
+    console.dir(document.body); // output the outer HTML/XML
+    console.dirxml(document.body); // output the outer HTML/XML
+    console.table(pData);
+    console.table(pData, ["firstname", "profession"]);
+    console.groupEnd();
+
+    console.profile("wastetime");
+    // calculate something...
+    console.profileEnd();
+
+    console.timeEnd("global script");
+
+  </script>
+</body>
+
+</html>
