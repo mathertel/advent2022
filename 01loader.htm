@@ -125,17 +125,16 @@
       await new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    document.addEventListener("DOMContentLoaded", async (e) => {
-      console.info("document=>DOMContentLoaded event");
-    })
-
-    window.addEventListener("load", async (e) => {
-      console.info("window=>load event");
-      await timeout(800);
-      document.querySelector(".loader").style.display = "none";
-      console.info("loader done.");
+    document.addEventListener('DOMContentLoaded', async(e) => {
+      console.info('document=>DOMContentLoaded event');
     });
 
+    window.addEventListener('load', async(e) => {
+      console.info('window=>load event');
+      await timeout(800);
+      document.querySelector('.loader').style.display = 'none';
+      console.info('loader done.');
+    });
   </script>
 </body>
 

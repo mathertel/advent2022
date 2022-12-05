@@ -236,80 +236,79 @@
   <script>
     console.clear(); // clear the log or show "console.clear() was prevented due to 'Preserve log'"
 
-    console.time("global script");
+    console.time('global script');
 
     // simple logging of text and parameters
     const pObj = {
-      key: "k", value: 42
+      key: 'k', value: 42
     };
 
     // simple data
     const pData = [
-      { id: 1233, firstname: "Jack", lastname: "Builder", profession: "stonemason" },
-      { id: 1235, firstname: "Ellen" },
-      { id: 1299, firstname: "Philip", profession: "prior" },
-      { id: 1299, firstname: "Richard ", lastname: "of Kingsbridge", profession: "knight" }
-      , 42
+      { id: 1233, firstname: 'Jack', lastname: 'Builder', profession: 'stonemason' },
+      { id: 1235, firstname: 'Ellen' },
+      { id: 1299, firstname: 'Philip', profession: 'prior' },
+      { id: 1299, firstname: 'Richard ', lastname: 'of Kingsbridge', profession: 'knight' },
+  42
     ];
 
-    console.debug("debug test (verbose level)", pObj);
+    console.debug('debug test (verbose level)', pObj);
 
-    console.group("info functions");
-    console.log("test:log (info level)", pObj);
-    console.trace("test:trace (info level)", pObj);
+    console.group('info functions');
+    console.log('test:log (info level)', pObj);
+    console.trace('test:trace (info level)', pObj);
 
-    console.assert(true, "test:assert-true", pObj);   // will not appear in console as everythin is ok.
+    console.assert(true, 'test:assert-true', pObj); // will not appear in console as everythin is ok.
     // console.assert( false, "info assert-false", pObj); // will stop in debugger with stack trace
     // console.assert( false, "info assert-false <%s>", pObj.key);
 
-    console.info("test:info (info level)", pObj);
-    console.info("test:formatted string %s", pObj);
-    console.info("test:formatted %%s %s", 966.5);
-    console.info("test:formatted %%d %d", 966.5);
-    console.info("test:formatted %%i %i", 966.5);
-    console.info("test:formatted %%f %f", 966.5);
-    console.info("test:formatted %%o %o", 966.5);
-    console.info("test:formatted %%o %o", pObj);
-    console.info("test:formatted %%c for CSS: %c GREEN %c RED", "color:green", "color:red");
+    console.info('test:info (info level)', pObj);
+    console.info('test:formatted string %s', pObj);
+    console.info('test:formatted %%s %s', 966.5);
+    console.info('test:formatted %%d %d', 966.5);
+    console.info('test:formatted %%i %i', 966.5);
+    console.info('test:formatted %%f %f', 966.5);
+    console.info('test:formatted %%o %o', 966.5);
+    console.info('test:formatted %%o %o', pObj);
+    console.info('test:formatted %%c for CSS: %c GREEN %c RED', 'color:green', 'color:red');
     console.groupEnd();
 
-    console.error("test:error (error level)", pObj);
-    console.warn("test:warn (warning level)", pObj);
+    console.error('test:error (error level)', pObj);
+    console.warn('test:warn (warning level)', pObj);
 
-    console.group("COUNT");
+    console.group('COUNT');
     console.count();
     console.count();
-    console.count("LAB");
-    console.count("LAB");
-    console.count("LAB");
+    console.count('LAB');
+    console.count('LAB');
+    console.count('LAB');
     console.count();
-    console.countReset("LAB")
-    console.count("LAB");
+    console.countReset('LAB');
+    console.count('LAB');
     console.groupEnd();
 
-    // Be aware that the initial logging of the object may differ from the value when expanding the object 
-    console.log("obj:", JSON.stringify(pObj)); // Object as string -> will not be changed on expansion
-    console.log("obj:", Object.assign({}, pObj)); // Copy of Object -> top level will not be changed on expansion
-    console.log("obj:", { ...pObj }); // Copy of Object -> top level will not be changed on expansion
-    console.log("obj:", pObj); // output the object Element
+    // Be aware that the initial logging of the object may differ from the value when expanding the object
+    console.log('obj:', JSON.stringify(pObj)); // Object as string -> will not be changed on expansion
+    console.log('obj:', Object.assign({}, pObj)); // Copy of Object -> top level will not be changed on expansion
+    console.log('obj:', { ...pObj }); // Copy of Object -> top level will not be changed on expansion
+    console.log('obj:', pObj); // output the object Element
     pObj.value++;
-    console.log("obj:", pObj); // again, but changed
+    console.log('obj:', pObj); // again, but changed
     pObj.value++;
     // See in the console:
 
-    console.groupCollapsed("test:data functions");
+    console.groupCollapsed('test:data functions');
     console.dir(document.body); // output the outer HTML/XML
     console.dirxml(document.body); // output the outer HTML/XML
     console.table(pData);
-    console.table(pData, ["firstname", "profession"]);
+    console.table(pData, ['firstname', 'profession']);
     console.groupEnd();
 
-    console.profile("wastetime");
+    console.profile('wastetime');
     // calculate something...
     console.profileEnd();
 
-    console.timeEnd("global script");
-
+    console.timeEnd('global script');
   </script>
 </body>
 

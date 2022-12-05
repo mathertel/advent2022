@@ -107,8 +107,6 @@ function waittimeP(duration = 100) {
   </main>
 
   <script>
-    // 
-
     const prot = document.querySelector('#prot');
 
     // use the OR operator for assigning a default value.
@@ -130,18 +128,16 @@ function waittimeP(duration = 100) {
     }
 
     function testcase(p) {
-      prot.append(`${(String(p)+"        ").slice(0,9)} -- \t${waittimeOR(p)}, \t      ${waittimeCO(p)}, \t    ${waittimeP(p)}\n`);
-
+      prot.append(`${(String(p) + '        ').slice(0, 9)} -- \t${waittimeOR(p)}, \t      ${waittimeCO(p)}, \t    ${waittimeP(p)}\n`);
     }
 
-    testcase("xx");
+    testcase('xx');
     testcase(33);
     testcase(false);
-    testcase("0");
+    testcase('0');
     testcase(0);
     testcase(null);
     testcase();
-
   </script>
 </body>
 
