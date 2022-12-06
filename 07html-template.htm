@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>The Template Element</title>
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>The Template Element</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>The <code>&lt;template&gt;</code> tag enables integrating HTML into the DOM without activating it.</p>
+      <p>This is a helpful mechanism to build SPA applications using native browser technologies only.</p>
+    </fieldset>
+
+    <p>This time the use-case is about deferred activating HTML (eventually also including javascript)
+      by using browser native mechanisms.</p>
+
+    <p>The aim is to speed up the web page initial load by separating HTML and functionality that is used later
+      from the main part of the web page.</p>
+
+    <p>The typical way the SPA frontend frameworks like Angular, react, vue etc. handle this case
+      is by loading and not executing javascript (bundle) files that will create the HTML and CSS by generated scripts.
+    </p>
+
+
+    <h2>The &lt;template&gt; tag</h2>
+
+    <p>The browser offers the possibility to load html elements without beeing included in the document
+      and allows loading javascript content that is not yet "executed". In short:</p>
+
+    <p><b>HTML can contain tags that are not in the DOM</b></p>
+
+    <p>The html tag that supports this is the <code>&lt;template&gt;</code> tag.</p>
+
+    <pre><code>&lt;template id=&quot;card&quot;&gt;
+  &lt;div style=&quot;margin:2px;padding:2px;border: 1px solid green&quot;&gt;
+    &lt;h3&gt;SHOW&lt;/h3&gt;
+    &lt;button onclick=&quot;hideContent(event)&quot;&gt;Hide&lt;/button&gt;
+    &lt;script&gt;
+      console.log(&apos;alive!&apos;);
+    &lt;/script&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+</code></pre>
+
+    <p>Any html and any javascript inside this tag is not activated on page load.</p>
+
+
+    <h2>Developing using a &lt;template&gt; tag</h2>
+
+    <p>To get access to the inner parts the DOM element for the <code>&lt;template&gt;</code>
+      tag has a <code>content</code> property that can be used for retrieving the inner DocumentFragment.</p>
+
+    <p>The <code>&lt;template&gt;</code> tag is supported by the HTML editors so you can create html and script inside
+      with the full editor support. While developing something new this is a good place to store the not-yet activated
+      html and code and use the full support in the IDE.</p>
+
+    <p>To activate such a piece of code is done using some very simple coding:</p>
+
+    <pre><code>function activateTemplate() {
+  const template = document.querySelector("template#card");
+  const clone = temp.content.cloneNode(true);
+  const ihObj = document.querySelector('span#insert-here');
+
+  ihObj.parentElement.insertBefore(clone, ihObj);
+} // activateTemplate</code></pre>
+
+    <p>By the <code>insertBefore(...)</code> call the html elements and script elements will get activated,
+      will be part of the DOM in the browser and eventual script is executed.</p>
+
+    <p>The <b>[Activate Template(1)]</b> button is executing this wnd will include the inner content inside the playgroud
+      area below.
+      You can repeat this multiple times and remove it again because the content includes a [Hide] button.</p>
+
+    <div class="playground" style="max-width: 30rem;">
+      <p><button id="addCard">Activate Template(1)</button></p>
+      <span id="insert-here"></span>
+    </div>
+
+    <p>A good practice here is to use a containing element and not add multiple elements in one template tag to make it
+      easy to remove the activated code again.</p>
+
+    <p>When you look at the first example implementation you will see that the script code inside the template will be
+      executed every time the template is used.</p>
+
+    <!-- However this may be unwanted in case you have one-time only functionality. -->
+
+    <h2>More to come</h2>
+
+    <p>There will be more features in this advent calendar collection using the template tag. come back. They will be
+      linked here.</p>
+
+    <!-- The templated code: -->
+
+    <template id="card">
+      <div style="margin:2px;padding:2px;border: 1px solid green">
+        <h3>SHOW</h3>
+        <button onclick="hideContent(event)">Hide</button>
+        <script>
+          console.log('alive!');
+        </script>
+      </div>
+    </template>
+    <!-- The script to use the template: -->
+
+    <script>
+      const bAddCard = document.querySelector('#addCard');
+      function activateTemplate() {
+        const temp = document.querySelector('template#card');
+        const clone = temp.content.cloneNode(true);
+
+        const ihObj = document.querySelector('span#insert-here');
+        ihObj.parentElement.insertBefore(clone, ihObj);
+      } // activateTemplate()
+
+      function hideContent(e) {
+        const card = e.currentTarget.parentElement;
+        card.parentElement.removeChild(card);
+      }
+
+      bAddCard.addEventListener('click', (_evt) => {
+        activateTemplate();
+      });
+    </script>
+
+    <h2>See also</h2>
+    <ul>
+      <li><a href="https://www.w3schools.com/TagS/tag_template.asp">
+          https://www.w3schools.com/TagS/tag_template.asp</a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template">
+          https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template</a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLTemplateElement">
+          https://developer.mozilla.org/en-US/docs/Web/API/HTMLTemplateElement</a></li>
+
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-html.htm">HTML</a>
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+
+  </main>
+</body>
+
+</html>
