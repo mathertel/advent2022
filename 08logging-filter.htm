@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Filtering console.logging</title>
+  <meta name="description" content="">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
+  <style>
+    .cheatSheet {
+      border: 2px solid gray;
+      padding: 0.5rem;
+      background-color: #eeeeee;
+    }
+
+    table.cheat {
+      border-collapse: collapse;
+    }
+
+    table.cheat td[colspan] {
+      padding-top: 0.5rem
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Filtering console.logging</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>Using console logging functionality in the browser
+        can be extended by adding a filtering function BEFORE sent to the console.</p>
+    </fieldset>
+
+    <p>Using debug output during development and error analysis is one of the most
+      important features.
+      Especially when analyzing time critical codings using the debugger will possibly
+      create corrupted results.</p>
+
+    <p>As shown some days before in <a href="05logging.htm">Standard console.logging</a>
+      there are many useful functions available and the console implementation in the browser
+      also has some nice features for showing or hiding messages to get the relevant
+      entries for analysis.</p>
+
+    <p>But when analyzing time critical codings a filter before actually sending information
+      to the console is helping focusing to the problem to be analyzed.</p>
+
+    <h2>Intersect console.debug calls</h2>
+
+    <p>Gladfully browsers allow re-assigning the functions in the console API
+      so we can intersect the functions:</p>
+
+    <pre><code>// intersect the console.debug function:
+const originalFunction = console.debug;
+
+console.debug = function () {
+  // do something with the arguments
+  // ...
+
+  // do the logging...
+  originalFunction.apply(this, arguments);
+}</code></pre>
+
+    <p>Here the original console.debug function is saved in the variable <code>originalFunction</code>
+      and is called with the same arguments using the apply method.
+      This can be repeated with the other functions like <code>info</code>, <code>warn</code>
+      and <code>error</code>.</p>
+
+    <h2>Implementing a filter and on/off switch</h2>
+
+    <p><small>(The console.debug function is used but the mechanism can be used for info, log and other logging functions.)</small></p>
+
+    <p>Now we can look into the arguments and can do something with it.
+      For filtering and printing the given arguments can be converted to a string
+      so we can look for patterns:
+    </p>
+
+
+    <pre><code>// simple arguments formatting
+function formatArguments(args) {
+  var out = Array.from(args).map((a) => String(a));
+  return (out.join(' '));
+}</code></pre>
+
+    <p>A global variable <code>debugFilter</code> can be used to only log cases with a given prefix.
+      A global variable <code>debugEnabled</code> can be used to turn console.debug logging on and off.</p>
+
+    <pre><code>// global filter settings
+let debugFilter = "";
+let debugEnabled = true;
+
+// filter console.debug function
+const originalFunction = console.debug;
+
+console.debug = function () {
+  const s = formatArguments(arguments);
+  if ((debugEnabled) && (s.includes(debugFilter))) {
+    originalFunction.apply(this, arguments);
+  }
+}</code></pre>
+
+    <h2>Example</h2>
+
+    <p>In the script of this page several console.debug calls with prefix </p>
+    <ul>
+      <li>'mouse:' (enter the mouse pointer on the page),</li>
+      <li> 'time:' (current time every second) and</li>
+      <li> 'global:' (some document events) are implemented.</li>
+    </ul>
+    <p>When opening the console all events will be shown.</p>
+    <p>To filter the events to a specific prefix run the following lines in the console:</p>
+
+    <pre><code>debugFilter='time:' // show only time events
+debugFilter=''      // show all events
+debugEnabled=false  // disable debug events
+debugEnabled=true   // enable debug events
+</code></pre>
+
+    <h2>See Also</h2>
+    <ul>
+      <li><a href="05logging.htm">Standard console.logging</a></li>
+      <li>On a next day we will see how to show loggin on the page instead of the console window.</li>
+      <li><a href="https://console.spec.whatwg.org/#logger">https://console.spec.whatwg.org/#logger</a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/console">https://developer.mozilla.org/en-US/docs/Web/API/console</a></li>
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+
+  </main>
+  <script>
+    // filter console.debug function
+    let debugFilter = ''; // "global:"; // only log the "global:" information not any "mouse:"
+    let debugEnabled = true;
+
+    // simple arguments formatting
+    function formatArguments(args) {
+      const out = Array.from(args).map((a) => String(a));
+      return (out.join(' '));
+    }
+
+    window.addEventListener('DOMContentLoaded', (_evt) => {
+      console.debug('global:', 'starting...');
+      const originalFunction = console.debug;
+
+      console.debug = function() {
+        const s = formatArguments(arguments);
+        if ((debugEnabled) && (s.includes(debugFilter))) {
+          originalFunction.apply(this, arguments);
+        }
+      };
+
+      // create debug output on document level...
+      console.debug('global:', new Date());
+      console.debug('global: global script end.');
+
+      // create debug output for mouse events...
+      document.addEventListener('mouseenter', (e) => console.debug('mouse:', e.target));
+
+      // report the time
+      window.setInterval(_evt => {
+        console.debug('time:', new Date().toISOString());
+      }, 1000);
+    });
+  </script>
+</body>
+
+</html>
