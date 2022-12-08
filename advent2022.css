@@ -17,6 +17,7 @@ body {
 
 
 main {
+  position: relative;
   width: 600px;
   max-width: 600px;
   margin: 0 auto;
@@ -34,7 +35,7 @@ main {
   --color: #111111;
   --back: #eeeeee;
   --code: #ffee88;
-}  
+}
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -45,14 +46,15 @@ main {
 
 .back {
   position: absolute;
-  top: 2rem;
-  right: 2rem;
+  top: 0.5rem;
+  left: 0;
   width: 2rem;
   height: 2rem;
+  border-radius: 0.4rem;
   background-color: red;
   background-size: 2rem 2rem;
   background-repeat: no-repeat;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M12 12L36 36M36 12L12 36' stroke='white' stroke-width='12' stroke-linecap='round' /></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M10 24l12 12M10 24l12-12M12 24h26' stroke='white' stroke-width='8' stroke-linecap='round' /></svg>");
   user-select: none;
   cursor: pointer;
 }
@@ -62,13 +64,14 @@ code {
   color: var(--color);
   padding: 0 0.2em;
 }
-pre > code {
+
+pre>code {
   position: relative;
   display: block;
   padding: 0.4em;
 }
 
-pre > code:hover::after {
+pre>code:hover::after {
   position: absolute;
   top: 0;
   right: 0;
@@ -79,12 +82,14 @@ pre > code:hover::after {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M30 36v6H6V18v0h6m6-12h24v24H18z' fill='none' stroke='black' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 }
 
-a, a:hover, a:visited {
+a,
+a:hover,
+a:visited {
   color: currentColor;
   text-decoration: underline;
 }
 
-.taglist > a {
+.taglist>a {
   display: inline-block;
   height: 1.6em;
   background: #203050;
@@ -96,11 +101,11 @@ a, a:hover, a:visited {
   color: #fff;
 }
 
-.taglist > a::before {
+.taglist>a::before {
   content: "#";
 }
 
-.taglist > a::after {
+.taglist>a::after {
   content: "";
   border-top: 0.8em solid transparent;
   border-bottom: 0.8em solid transparent;
