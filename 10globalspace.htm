@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Variables in the Global Space</title>
+  <meta name="description" content="Variables in the Global Space">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <style>
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Variables in the Global Space</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>How can you find out about already existing global variables ?</p>
+      <p>Summary: you can - but only partially.</p>
+    </fieldset>
+
+    <p>I had this question while analyzing a complex web site and application with several
+      independent implemented parts inside and some effects that "smell" for being caused
+      by affecting each other.</p>
+
+    <p>So how do global variables work.</p>
+
+    <h2>The global scope and `var` variables</h2>
+
+    <p>Defining a global variable using the `var` statement is using a global scope.
+      This scope is available as an Object using the `globalThis` and in browsers the `window` Object.</p>
+
+    <p>In global script blocks in the browser the 3 statements actually do the same:</p>
+    <pre><code>var varBucket = "HelloBucket";
+window.varBucket = "HelloBucket";
+globalThis.varBucket = "HelloBucket";</code></pre>
+
+    <p>To test this, just have a look in the console for the output of the following script:</p>
+
+    <pre><code>var varBucket = 'HelloBucket1';
+console.log(varBucket, window.varBucket, globalThis.varBucket,
+  globalThis['varBucket'], eval('varBucket') );
+window.varBucket = 'HelloBucket2';
+console.log(varBucket, window.varBucket, globalThis.varBucket,
+  globalThis['varBucket'], eval('varBucket') );
+globalThis.varBucket = 'HelloBucket3';
+console.log(varBucket, window.varBucket, globalThis.varBucket,
+  globalThis['varBucket'], eval('varBucket') );</code></pre>
+
+    <p>creating the following output in the console:</p>
+
+    <pre style="background-color: lightgrey;">HelloBucket1 HelloBucket1 HelloBucket1 HelloBucket1 HelloBucket1
+  HelloBucket2 HelloBucket2 HelloBucket2 HelloBucket2 HelloBucket2
+  HelloBucket3 HelloBucket3 HelloBucket3 HelloBucket3 HelloBucket3</pre>
+
+    <h2>The global scope and `let` variables</h2>
+
+    <p>A lot of articles on the internet suggest using `let` or `const` instead of `var`.
+      Using the same script above with `let` based variable definitions shows that the globalThis object will not reflect these variables:</p>
+
+    <pre><code>let letBucket = 'HelloBucket1';
+console.log(letBucket, window.letBucket, globalThis.letBucket,
+  globalThis['letBucket'], eval('letBucket') );
+letBucket = 'HelloBucket2-a';
+window.letBucket = 'HelloBucket2-b';
+console.log(letBucket, window.letBucket, globalThis.letBucket,
+  globalThis['letBucket'], eval('letBucket') );
+globalThis.letBucket = 'HelloBucket3';
+console.log(letBucket, window.letBucket, globalThis.letBucket,
+  globalThis['letBucket'], eval('letBucket') );</code></pre>
+
+    <p>creating the following output in the console:</p>
+
+    <pre style="background-color: lightgrey;">HelloBucket1 undefined undefined undefined HelloBucket1
+HelloBucket1 HelloBucket2 HelloBucket2 HelloBucket2 HelloBucket1
+HelloBucket1 HelloBucket3 HelloBucket3 HelloBucket3 HelloBucket1</pre>
+
+    <p>The <code>globalThis</code> is obviously not including these global variables.</p>
+
+    <h2>List defined global variables</h2>
+
+    <p>So the following trick only works for the `var` based variables:</p>
+
+    <pre><code>// analyze all attributes of globalThis
+const keys = {};
+
+const globalThisKeys = Object.keys(globalThis);
+globalThisKeys.forEach(k => {
+  keys[k] = { key: k, type: typeof globalThis[k] };
+});
+  
+// list of standard attributes on the window object
+const stdWindowKeys = 'window,self,document,name,location,
+  (cut here),
+  webkitResolveLocalFileSystemURL'.split(',');
+
+stdWindowKeys.forEach(k => {
+  delete keys[k];
+});
+
+console.table(keys);</code></pre>
+
+    <p>Have a look to the console output to see the result. Happy debugging...</p>
+
+    <h2>See Also</h2>
+
+    <ul>
+      <li><a href="https://vivadifferences.com/difference-between-var-let-and-const-in-javascript/">https://vivadifferences.com/difference-between-var-let-and-const-in-javascript/</a></li>
+      <li><a href="https://dev.to/shivamkapasia0/var-let-and-const-1h5g">https://dev.to/shivamkapasia0/var-let-and-const-1h5g</a></li>
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+  </main>
+  <script>
+    var varBucket = 'HelloBucket1';
+    console.log('var-rest');
+    console.log(varBucket, window.varBucket, globalThis.varBucket, globalThis['varBucket'], eval('varBucket'));
+    window.varBucket = 'HelloBucket2';
+    console.log(varBucket, window.varBucket, globalThis.varBucket, globalThis['varBucket'], eval('varBucket'));
+    globalThis.varBucket = 'HelloBucket3';
+    console.log(varBucket, window.varBucket, globalThis.varBucket, globalThis['varBucket'], eval('varBucket'));
+
+    console.log('let-rest');
+    let letBucket = 'HelloBucket1';
+    console.log(letBucket, window.letBucket, globalThis.letBucket, globalThis['letBucket'], eval('letBucket'));
+    window.letBucket = 'HelloBucket2';
+    console.log(letBucket, window.letBucket, globalThis.letBucket, globalThis['letBucket'], eval('letBucket'));
+    globalThis.letBucket = 'HelloBucket3';
+    console.log(letBucket, window.letBucket, globalThis.letBucket, globalThis['letBucket'], eval('letBucket'));
+
+    // analyze all attributes of globalThis
+    const keys = {};
+
+    const globalThisKeys = Object.keys(globalThis);
+    globalThisKeys.forEach(k => {
+      keys[k] = { key: k, type: typeof globalThis[k] };
+    });
+
+    // list of standard attributes on the window object
+    const stdWindowKeys = 'window,self,document,name,location,customElements,history,locationbar,menubar,personalbar,scrollbars,statusbar,toolbar,status,closed,frames,length,top,opener,parent,frameElement,navigator,origin,external,screen,innerWidth,innerHeight,scrollX,pageXOffset,scrollY,pageYOffset,visualViewport,screenX,screenY,outerWidth,outerHeight,devicePixelRatio,clientInformation,screenLeft,screenTop,defaultStatus,defaultstatus,styleMedia,onsearch,isSecureContext,trustedTypes,performance,onappinstalled,onbeforeinstallprompt,crypto,indexedDB,sessionStorage,localStorage,onbeforexrselect,onabort,onbeforeinput,onblur,oncancel,oncanplay,oncanplaythrough,onchange,onclick,onclose,oncontextlost,oncontextmenu,oncontextrestored,oncuechange,ondblclick,ondrag,ondragend,ondragenter,ondragleave,ondragover,ondragstart,ondrop,ondurationchange,onemptied,onended,onerror,onfocus,onformdata,oninput,oninvalid,onkeydown,onkeypress,onkeyup,onload,onloadeddata,onloadedmetadata,onloadstart,onmousedown,onmouseenter,onmouseleave,onmousemove,onmouseout,onmouseover,onmouseup,onmousewheel,onpause,onplay,onplaying,onprogress,onratechange,onreset,onresize,onscroll,onsecuritypolicyviolation,onseeked,onseeking,onselect,onslotchange,onstalled,onsubmit,onsuspend,ontimeupdate,ontoggle,onvolumechange,onwaiting,onwebkitanimationend,onwebkitanimationiteration,onwebkitanimationstart,onwebkittransitionend,onwheel,onauxclick,ongotpointercapture,onlostpointercapture,onpointerdown,onpointermove,onpointerrawupdate,onpointerup,onpointercancel,onpointerover,onpointerout,onpointerenter,onpointerleave,onselectstart,onselectionchange,onanimationend,onanimationiteration,onanimationstart,ontransitionrun,ontransitionstart,ontransitionend,ontransitioncancel,onafterprint,onbeforeprint,onbeforeunload,onhashchange,onlanguagechange,onmessage,onmessageerror,onoffline,ononline,onpagehide,onpageshow,onpopstate,onrejectionhandled,onstorage,onunhandledrejection,onunload,crossOriginIsolated,scheduler,alert,atob,blur,btoa,cancelAnimationFrame,cancelIdleCallback,captureEvents,clearInterval,clearTimeout,close,confirm,createImageBitmap,fetch,find,focus,getComputedStyle,getSelection,matchMedia,moveBy,moveTo,open,postMessage,print,prompt,queueMicrotask,releaseEvents,reportError,requestAnimationFrame,requestIdleCallback,resizeBy,resizeTo,scroll,scrollBy,scrollTo,setInterval,setTimeout,stop,structuredClone,webkitCancelAnimationFrame,webkitRequestAnimationFrame,chrome,caches,cookieStore,ondevicemotion,ondeviceorientation,ondeviceorientationabsolute,launchQueue,onbeforematch,getScreenDetails,queryLocalFonts,showDirectoryPicker,showOpenFilePicker,showSaveFilePicker,originAgentCluster,navigation,webkitStorageInfo,speechSynthesis,openDatabase,webkitRequestFileSystem,webkitResolveLocalFileSystemURL'.split(',');
+
+    stdWindowKeys.forEach(k => {
+      delete keys[k];
+    });
+
+    console.table(keys);
+  </script>
+</body>
+
+</html>
