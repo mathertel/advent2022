@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Clean Javascript</title>
+  <meta name="description" content="Setup and use ESLint to create clean Javascript.">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <style>
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Setup and use ESLint to create clean Javascript</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>ESLint today is the most advanced tool to have static analyzed Javascript to detect inconsistencies
+        and also problems in your scripts.</p>
+    </fieldset>
+
+    <p>This tools you should not miss when writing javascript (or typescript) for browsers.</p>
+    <p>ES stands for "ecmascript" -- the official name of the JavaScript standard.</p>
+    <p>Here is a compehensive setup guide and some options explained as you will have to repeat these steps in every project.</p>
+
+    <h2>Setup ESlint</h2>
+
+    <p>You have to setup a npm project in the root folder using <code>npm init</code> and answer some questions
+      on your project or just hit return several times and edit package.json later.</p>
+
+    <p>Setup of the ESlint tool is a simple as:</p>
+
+    <pre><code>&gt;npm init @eslint/config</code></pre>
+
+    <p>The you have to answer some questions and then you go.</p>
+
+    <pre style="background-color: lightgrey;">&gt;npm init @eslint/config
+
+  Need to install the following packages:
+  @eslint/create-config@0.4.1
+  Ok to proceed? (y) y
+  √ How would you like to use ESLint? · style
+  √ What type of modules does your project use? · esm
+  √ Which framework does your project use? · none
+  √ Does your project use TypeScript? · No / Yes
+  √ Where does your code run? · browser, node
+  √ How would you like to define a style for your project? · guide
+  √ Which style guide do you want to follow? · standard-with-typescript
+  √ What format do you want your config file to be in? · JavaScript
+  ... setup</pre>
+
+    <p>As a result the required packages are now as dev dependencies in your package.json file
+      a configuration file named <code>.eslintrc.js</code>
+      and all dependencies are also installed in the node_modules folder.</p>
+
+    <p>package.json:</p>
+
+
+    <pre style="background-color: lightgrey;">{
+  "name": "my-project",
+  "version": "1.0.0",
+  "description": "mnimal browser script linting",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.46.0",
+    "eslint": "^8.29.0",
+    "eslint-config-standard-with-typescript": "^23.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.6.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "typescript": "^4.9.4"
+  }
+}</pre>
+
+    <p>.eslintrc.js:</p>
+    <pre style="background-color: lightgrey;">
+module.exports = {
+  env: {
+    browser: true,
+    es2021: true
+  },
+  extends: 'standard-with-typescript',
+  overrides: [
+  ],
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module'
+  },
+  rules: {
+  }
+}</pre>
+
+    <p>The project is now ready to be analyzed using the eslint command:</p>
+
+    <pre><code>&gt;eslint *.js</code></pre>
+
+    <p>In case you use a development environment like visual studio you can install a extension and the errors will also be shown in the Problems window.</p>
+
+
+    <h2>Script in HTML files</h2>
+
+    <p>To support scanning html files with script tags inside a html plugin can be installed:</p>
+
+    <pre><code>&gt;npm i --save-dev eslint-plugin-html</code></pre>
+
+    <p>you also have to add the plugin to the <code>.eslintrc.js</code> configuration:</p>
+
+    <pre><code>plugins: ['html'],</code></pre>
+
+    <p>Using <code>npm docs eslint-plugin-html</code> you can find more information about this plugin
+      as you also have options to lint the html itself.</p>
+
+    <h2>Options...</h2>
+
+    <p>so many, just look into the docs using <code>npm docs eslint</code>.
+     My personal settings for this project you can find in the .eslint.js file in github at:
+    <a href="https://github.com/mathertel/advent2022/blob/main/.eslint.js">https://github.com/mathertel/advent2022/blob/main/.eslint.js</a></p>
+
+
+    <h2>See Also</h2>
+
+    <ul>
+      <li><a href="https://eslint.org/">https://eslint.org/</a></li>
+      <li><a href="https://devblogs.microsoft.com/visualstudio/building-a-new-javascript-linting-experience-in-visual-studio/">https://devblogs.microsoft.com/visualstudio/building-a-new-javascript-linting-experience-in-visual-studio/</a></li>
+      <li><a href="https://typescript-eslint.io/getting-started">https://typescript-eslint.io/getting-started</a></li>
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+      <a href="tag-nodejs.htm">Node.JS</a>
+    </div>
+  </main>
+  <script>
+
+  </script>
+</body>
+
+</html>
