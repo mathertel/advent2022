@@ -18,11 +18,18 @@ body {
 
 main {
   position: relative;
-  width: 600px;
-  max-width: 600px;
+  width: 800px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 2rem 0;
 }
+
+main > p,
+/* main > fieldset, */
+main > pre {
+  margin-left: 2rem;
+}
+
 
 *,
 *::before,
