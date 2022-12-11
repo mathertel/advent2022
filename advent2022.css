@@ -25,7 +25,7 @@ main {
 }
 
 main > p,
-/* main > fieldset, */
+main > ul,
 main > pre {
   margin-left: 2rem;
 }
