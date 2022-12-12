@@ -8,6 +8,8 @@ function codeCopy(evt) {
     navigator.clipboard.writeText(t.innerText);
   }
 }
+
+
 document.querySelectorAll('pre>code').forEach(e => {
   e.addEventListener('click', codeCopy);
 });

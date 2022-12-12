@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Defer Loading with Templates</title>
+  <meta name="description" content="[RAW]">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <style>
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Defer Loading with Templates</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>This is a comprehensive overview on how to defer loading HTML (including script).
+        to optimizing the load time of web applications by deferring loading other stuff
+        that is not required at start time.</p>
+    </fieldset>
+
+    <h2>Lifecycle in Web Applications</h2>
+
+    <p>In typical web applications and web sites you often can find functionality
+      that is not required during the first impression:</p>
+
+    <p>Load and activate everything on loading an application is a anti-pattern web applications
+      especially the bigger ones or the ones used by mobile devices.</p>
+
+    <p>Loading parts of the application that is only required in rare cases at a later time
+      is a reasonable solution.</p>
+
+    <p>Loading application parts that have a high probability of beeing used is another pattern to be implemented.</p>
+
+    <h2>Loading Functionality</h2>
+
+    <p>Many web frameworks convert HTML and CSS into Javascript and use the integration pattern of adding
+      <code>&lt;script&gt;</code> tags dynamically. This additional JavaScript code is providing
+      entry point functions that can be used. This also allows pre-loading of modules
+      and separating the loading phase from the activation.
+    </p>
+
+    <p>As we have seen in <a href="07html-template.htm">The Template Element</a> the browser supports
+      storing content that is not yet part of the document and fits good into deferred loading procedure
+      as loading can be done without effecting any other ongoing scripts.</p>
+
+    <p>A loading function looks like:</p>
+
+    <pre><code>// load template tName from URL
+function loadTemplate(tName) {
+  const p = new Promise((resolve, _reject) =&gt; {
+    const templ = document.querySelector(tName);
+    const url = templ.getAttribute(&apos;url&apos;);
+    fetch(url)
+      .then(r =&gt; r.text())
+      .then(txt =&gt; {
+        templ.innerHTML = txt;
+        resolve();
+      });
+  });
+  return (p);
+}</code></pre>
+
+    <h2>Example</h2>
+
+    <p>The simple example from <a href="07html-template.htm">07 The Template Element</a> is reused for this but the
+      template element is now having a url instead of innerHTML:</p>
+
+    <pre><code>&lt;template id=&quot;card&quot; url=&quot;./13card.htm&quot;&gt;&lt;/template&gt;</code></pre>
+
+    <p>Loading starts in this example by the DOMContentLoaded event that is calling the <code>loadTemplate()</code> function:</p>
+
+    <pre><code>document.addEventListener('DOMContentLoaded', _e => {
+  const p = loadTemplate('#card');
+  p.then(_e => { console.info("templ:", "loaded."); });
+});</code></pre>
+
+<p>Now everything is ready and the Activation Button will work.</p>
+
+<div class="playground" style="max-width: 30rem;">
+      <p><button id="addCard">Activate Template(1)</button></p>
+      <span id="insert-here"></span>
+    </div>
+
+    <template id="card" url="./13card.htm"></template>
+
+    <h2>Summary</h2>
+
+    <p>Loading parts of an application can be deferred without effecting the page.
+      What's next ?
+    </p>
+
+    <h2>See Also</h2>
+    <ul></ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+  </main>
+  <script>
+
+    const bAddCard = document.querySelector('#addCard');
+
+    // load template tName from URL
+    function loadTemplate(tName) {
+      const p = new Promise((resolve, _reject) => {
+        const templ = document.querySelector(tName);
+        const url = templ.getAttribute('url');
+        fetch(url)
+          .then(r => r.text())
+          .then(txt => {
+            templ.innerHTML = txt;
+            resolve();
+          });
+      });
+      return (p);
+    }
+
+    function activateTemplate() {
+      const temp = document.querySelector('template#card');
+      const clone = temp.content.cloneNode(true);
+
+      const ihObj = document.querySelector('span#insert-here');
+      ihObj.parentElement.insertBefore(clone, ihObj);
+    } // activateTemplate()
+
+    function hideContent(e) {
+      const card = e.currentTarget.parentElement;
+      card.parentElement.removeChild(card);
+    }
+
+    bAddCard.addEventListener('click', (_evt) => {
+      activateTemplate();
+    });
+
+    document.addEventListener('DOMContentLoaded', _e => {
+      const p = loadTemplate('#card');
+      p.then(_e => {
+        console.info("templ:", "loaded.");
+      });
+    });
+
+  </script>
+</body>
+
+</html>
