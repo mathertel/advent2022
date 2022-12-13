@@ -1,11 +1,15 @@
 <div style="margin:2px;padding:2px;border: 1px solid green">
-  <h3>SHOW</h3>
+  <h3>title</h3>
+  <span></span>
   <button onclick="hideContent(event)">Hide</button>
   <script>
-    console.log('alive!');
+    console.log('alive!', document.currentScript.parentElement);
+
+    document.currentScript.parentElement.addEventListener('start', evt => {
+      const scope = evt.target;
+      console.log('card:', 'start...', evt.detail);
+      scope.querySelector('h3').innerText = evt.detail.title;
+      scope.querySelector('span').innerText = evt.detail.message;
+    });
   </script>
 </div>
-
-<script type="application/javascript">
-  console.info('card:', 'run...');
-</script>

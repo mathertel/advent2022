@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Module Loader Web Components</title>
+  <meta name="description" content="Deferred loading a module using a web control.">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="templateloader.js"></script>
+  <style>
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Module Loader Web Control</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>Loading modules in templates can even be done in a effective way using
+        a Web Component implementation.</p>
+    </fieldset>
+
+    <p>Web Component can bridge the gap between declarative and programatic module implementations.
+      It also simplifies implementation by enriching a standard tag with further functionality:</p>
+
+    <p>The implementation supports developping modules in the template element inline code
+      that can simply extracted into an extra file to be loaded on demand.</p>
+
+    <ul>
+      <li>The URL attribute on the tag specify the url to the resources to be loaded.</li>
+      <li>The autoLoad attribute specifies wether the template should be loaded automatically
+        after the page was activated</li>
+      <li>the <code>load()</code> function allows loading the template on demand</li>
+      <li>the <code>start()</code> function allows starting the template implementation on demand</li>
+    </ul>
+
+    <p>Both functions work with promises so you can trigger a <code>start()</code> and the module will be
+      loaded and started after availability. A parameter can be passed.</p>
+
+    <h2>Problems and Solution with the &lt;template&gt; tag</h2>
+
+    <p>After having the content available in the browser there is no well-defined way to add
+      this to the template content.</p>
+
+    <ul>
+      <li>setting the innerHTML will create all nodes but as defined in innerHTML behavior will not start the scripts.
+        This is ok as at this stage we don't want script to be executed but cloning the content also doesn't
+        activate the script.</li>
+      <li>setting the innerText doesn't create child elements as required.</li>
+      <li>using createContextualFragment(txt) will directly trigger the script in the load phase that is unwanted
+        not not behaving as a standard template.</li>
+    </ul>
+
+    <p>Using innerHTML seems to be near to the standard behavior where html and script is available in the template content
+      but not yet activated. However using innerHTML will be banned for security reasons in some cases so innterText is used here
+      and JavaScript is activated in the moment we clone the content into the target place.</p>
+
+    <h2>Playgroud</h2>
+
+<p>Using template based module is declared using the following HTML code:</p>
+
+<pre><code>&lt;template is=&quot;template-loader&quot; id=&quot;card&quot; autoLoad=&quot;false&quot; url=&quot;./13card.htm&quot;&gt;&lt;/template&gt;</code></pre>
+
+    <p>Have a look into the Template Loader implementation in the file <a href="templateloader.js">templateloader.js</a>.</p>
+
+    <p>To use a template with deferred loading just call:</p>
+    <pre><code>const cardModule = document.querySelector('template#card');
+cardModule.load();
+cardModule.start('#insert-here', { title: 'Hello', message: (new Date()).toISOString() });</code></pre>
+
+    <p>Calling the load() function is optional as the start() function will take care of loading
+      in case the template has not been loaded yet.</p>
+
+      <p>The start() function accepts a marker where the template should be used in the document
+      and a optional parameter with data.</p>
+
+    <div class="playground" style="max-width: 30rem;">
+      <p><button id="loadCard">Load Module</button> <button id="startCard">Start Module</button></p>
+      <span id="insert-here"></span>
+    </div>
+
+    <template is="template-loader" id="card" autoLoad="false" url="./13card.htm"></template>
+
+
+    <h2>See Also</h2>
+    <ul>
+      <li><a href="07html-template.htm">7 The Template Element</a></li>
+      <li><a href="13deferloading.htm">13 Defer Loading with Templates</a></li>
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+  </main>
+
+  <script>
+    const cardModule = document.querySelector('template#card');
+
+    document.querySelector('#loadCard').addEventListener('click', async (_evt) => {
+      await cardModule.load();
+    });
+
+    document.querySelector('#startCard').addEventListener('click', async (_evt) => {
+      await cardModule.start('#insert-here', { title: 'Hello', message: (new Date()).toISOString() });
+    });
+
+    function hideContent(e) {
+      const card = e.currentTarget.parentElement;
+      card.parentElement.removeChild(card);
+    }
+  </script>
+</body>
+
+</html>

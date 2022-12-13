@@ -115,8 +115,7 @@ function loadTemplate(tName) {
         fetch(url)
           .then(r => r.text())
           .then(txt => {
-            const f = document.createRange().createContextualFragment(txt);
-            templ.appendChild(f);
+            templ.innerHTML = txt;
             resolve();
           });
       });
