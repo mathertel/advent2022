@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
   <title>Defer Loading with Templates</title>
-  <meta name="description" content="[RAW]">
+  <meta name="description" content="JavaScript deferred loading of templates.">
   <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
   <style>
   </style>
@@ -115,7 +115,8 @@ function loadTemplate(tName) {
         fetch(url)
           .then(r => r.text())
           .then(txt => {
-            templ.innerHTML = txt;
+            const f = document.createRange().createContextualFragment(txt);
+            templ.appendChild(f);
             resolve();
           });
       });
@@ -142,7 +143,7 @@ function loadTemplate(tName) {
     document.addEventListener('DOMContentLoaded', _e => {
       const p = loadTemplate('#card');
       p.then(_e => {
-        console.info("templ:", "loaded.");
+        console.info('templ:', 'loaded.');
       });
     });
 
