@@ -187,7 +187,6 @@
     <pre id="formOutput" style="background-color: lightgrey;padding:0.5rem"></pre>
 
 
-
     <h2>See Also</h2>
 
     <ul>
@@ -215,7 +214,7 @@
         description: 'Test Data\nand more',
         mode: 'auto'
       });
-      showData();
+      // showData();
     });
 
     function showData(_evt) {
@@ -233,6 +232,7 @@
 
     const f = document.forms.contactForm;
     f.addEventListener('change', showData);
+    f.addEventListener('reset', showData);
     document.addEventListener('DOMContentLoaded', showData);
 
   </script>
