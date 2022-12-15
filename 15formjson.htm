@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>HTML Forms with JSON</title>
+  <meta name="description" content="About using JSON with form elements">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
+  <style>
+    .form-grid {
+      display: grid;
+      grid-template-columns: 12.6ch auto;
+      grid-gap: 5px;
+      margin-bottom: 0.5rem;
+
+    }
+
+    .form-grid>* {
+      grid-column-end: -1;
+    }
+
+    .form-grid>label {
+      grid-column: 1;
+      text-align: right;
+    }
+
+    .form-grid>.wide {
+      grid-column: 1/-1;
+    }
+
+    .form-inline {
+      height: 1.6em;
+    }
+
+    .form-inline>* {
+      vertical-align: top;
+    }
+
+    output {
+      min-height: 1.6em;
+      padding: 1px 2px;
+      border: 2px solid transparent
+    }
+
+    pre.code {
+      padding: 1rem;
+      background-color: rgb(255, 248, 230);
+    }
+
+    code {
+      background-color: rgb(255, 248, 230);
+    }
+  </style>
+  <script src="formjson.js"></script>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>HTML Forms with JSON</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>HTML Elements used in HTML forms do not support JSON based dataset out of the box and the FormData
+        class also is quiet incomplete.</p>
+      <p>Here is a web component that extends form elements to work with JSON data.</p>
+    </fieldset>
+
+
+    <h2>Using Browser standard FormData</h2>
+
+    <p>The browser supports the FormData class that can be used to fetch all data from form elements.</p>
+
+    <p>This is implementing the behavior that is known from the classic Form Submit to submit all data using a POST request and
+      the application/form-data or other data formats. This can be converted to a JavaScript Object.</p>
+
+    <p>But the JSON object created from the FormData is not strictly following the JSON approach:</p>
+
+    <ul>
+      <li>HTML Input elements with an empty value do not create an attribute</li>
+      <li>Checkboxes create an attribute with value "on" when selected - not a boolean value.</li>
+    </ul>
+
+    <p>Also a reverse operation to modify a form value is not implemented.</p>
+
+    <p>These are small gaps in the native browser implementation that can be healed easily
+      by using a WebControl that is attached to the form element.
+      It supports getting and setting the form data using a propper JavaScript object.</p>
+
+    <h3>Implementation details</h3>
+
+    <p>When the form is ready it gets analyzed once to retrieve the possible object attributes
+      and to create a default record with the default values.</p>
+
+    <p>The attributes that should be treated as booleans are found as they are
+      represented by checkboxes.</p>
+
+    <p>The <code>getJsonData()</code> method returns the current values from the form.</p>
+    <p>The <code>setJsonData(d)</code> method can be used to set a single or multiple form values
+      without directly accessing the HTML elements directly.</p>
+
+
+    <h2>Pimp up FORMs to use with JSON data</h2>
+
+    <p>To enrich &lt;form&gt; elements to work with JSON data the following code is needed:</p>
+    <ul>
+      <li>In the header the script must be included like:<br><code>&lt;script src="formJsonData.js"&gt;&lt;/script&gt;</code>
+      </li>
+      <li>The form element needs 2 additional attributes:<br>
+        <code>&lt;form is="form-json" method="dialog"&gt;</code>
+      </li>
+    </ul>
+    </p>
+    <p>By using is="form-json" the included class is now extending the form functionality.</p>
+    <p>The attribute method=dialog stops the standard "submit" behavior.</p>
+
+    <h2>Example</h2>
+    <form name="contactForm" is="form-json" class="form-grid" method="dialog">
+      <label>id:</label>
+      <input name="id" type="hidden" value="136" />(hidden)
+
+      <label>email:</label>
+      <input name="email" type="email" />
+
+      <label>name:</label>
+      <input name="name" type="string" />
+
+      <label>registered:</label>
+      <input name="registered" type="checkbox" />
+
+      <label>subscribed:</label>
+      <input name="subscribed" type="checkbox" />
+
+      <label>color:</label>
+      <input name="color" type="color" />
+
+      <label>gender:</label>
+      <select name="gender">
+        <option value="male">male</option>
+        <option value="female" selected>female</option>
+        <option value="diverse">diverse</option>
+      </select>
+
+      <label>animal:</label>
+      <input name=animal list=animals>
+      <datalist id=animals>
+        <option value="Cat">
+        <option value="Dog">
+        <option value="Mouse">
+      </datalist>
+
+      <label>level:</label>
+      <input name="level" type="range" />
+      <div class="form-inline">
+        <meter name="level" low="20" high="80" min="0" optimum="55" max="100"></meter>
+        <output name="level">s</output>
+      </div>
+
+      <label>description:</label>
+      <textarea name="description"></textarea>
+
+      <label>mode:</label>
+      <div class="form-inline">
+        <input name="mode" type="radio" value="off" /><label>off</label>
+        <input name="mode" type="radio" value="on" /><label>on</label>
+        <input name="mode" type="radio" value="auto" /><label>auto</label>
+        <output name="mode"></output>
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+
+    <h3>new form functions</h3>
+    <button id="bLoad">Load Example</button>
+    <button onclick="javascript:document.forms.contactForm.setJsonData({registered:true})">set registered:true</button>
+    <button onclick="javascript:document.forms.contactForm.setJsonData({registered:false})">set registered:false</button>
+    <button onclick="javascript:document.forms.contactForm.reset()">reset</button>
+
+    <h3>Form Data returned:</h3>
+
+    <h4>Raw:</h4>
+    <pre id="formRawData" style="background-color: lightgrey;padding:0.5rem"></pre>
+
+    <h4>Enriched:</h4>
+    <pre id="formOutput" style="background-color: lightgrey;padding:0.5rem"></pre>
+
+
+
+    <h2>See Also</h2>
+
+    <ul>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects">https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects</a></li>
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+
+
+  </main>
+  <script>
+    document.querySelector('#bLoad').addEventListener('click', _evt => {
+      document.forms.contactForm.setJsonData({
+        id: '136',
+        email: 'noreply@nowhere.com',
+        name: 'Joe Dow',
+        subscribed: 'on',
+        color: '#2fb6ad',
+        gender: 'diverse',
+        animal: 'Horse',
+        level: '42',
+        description: 'Test Data\nand more',
+        mode: 'auto'
+      });
+      showData();
+    });
+
+    function showData(_evt) {
+      const f = document.forms.contactForm;
+      const jd = f.getJsonData();
+      document.querySelector('#formOutput').textContent = JSON.stringify(jd, null, 2);
+
+      // also show raw data
+      const fd = new FormData(document.forms.contactForm);
+      document.querySelector('#formRawData').textContent = JSON.stringify(Object.fromEntries(fd), null, 2);
+
+      // play back to output elements
+      f.setJsonData(jd);
+    }
+
+    const f = document.forms.contactForm;
+    f.addEventListener('change', showData);
+    document.addEventListener('DOMContentLoaded', showData);
+
+  </script>
+
+</body>
+
+</html>
