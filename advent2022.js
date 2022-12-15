@@ -12,4 +12,16 @@ function codeCopy(evt) {
 
 document.querySelectorAll('pre>code').forEach(e => {
   e.addEventListener('click', codeCopy);
+  // remove any leading and trailing empty lines and spaces
+  const c = e.innerHTML;
+
+  const fc = e.firstChild;
+  if (fc.nodeType === document.TEXT_NODE) {
+    fc.textContent = fc.textContent.replace(/^\s+/, '');
+  }
+
+  const lc = e.lastChild;
+  if (lc.nodeType === document.TEXT_NODE) {
+    lc.textContent = lc.textContent.replace(/\s+$/, '');
+  }
 });

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Unique filter on Arrays</title>
+  <meta name="description" content="Implement an efficient unique filter on arrays">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Unique filter on Arrays</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>Implement an efficient unique filter on arrays</p>
+    </fieldset>
+
+    <p>The Array object has a lot of native functions to use and manipulate arrays. However a unique() function is missing.
+      I wrote my own (badly) implementation. <br>
+      Later I discovered that it can be done by a single statement. <br>
+      Later I discovered that it was already implemented as a proposal for the future.</p>
+
+    <h2>Extending the Array object</h2>
+
+    <p>The Array object can be extended by a simple unique function like:</p>
+
+    <pre><code>Array.prototype.unique = function () { return [...new Set(this)] };</code></pre>
+
+    <p>This will allow using the unique functions on array with primitive values:</p>
+
+    <pre><code>
+const arr = [1, 1, 2, 3, 3, 4, 4, 4, 5, 5];
+console.info('unique:', arr.unique());
+    </code></pre>
+
+    <p>In JavaScript it is a common implementation pattern that a function can be passed by a parameter to customize the behavior
+      like the <code>sort()</code> function does.
+      On a unique function this is required as well to enable using it for more complex data objects.</p>
+
+    <p>In github in the repo <a href="https://github.com/tc39">https://github.com/tc39</a>
+      you can find the proposals for upcoming JavaScript features like the
+      <a href="https://github.com/tc39/proposal-array-unique">proposal-array-unique</a> repo.
+    </p>
+
+    <p>Here they propose the name <code>uniqueBy(f)</code> and also have a polyfill implementation that the :</p>
+
+    <pre><code>
+if (typeof Array.prototype.uniqueBy !== 'function') {
+  Object.defineProperty(Array.prototype, 'uniqueBy', {
+    writable: true,
+    configurable: true,
+    value: function (f = undefined) {
+      if (!f) return [...new Set(this)];
+      const map = new Map();
+
+      for (const item of this) {
+        const key = f(item);
+        if (!map.has(key)) { map.set(key, item); }
+      }
+
+      return [...map.values()];
+    }
+  });
+}
+    </code></pre>
+
+
+    <h2>Example</h2>
+
+    <p>You can find a implementation on using both functions in the script of this page. Happy debugging.</p>
+
+
+    <h2>Summary</h2>
+
+    <p>Now you are aware of features that will probably be implemented on the next time
+      so you can stick to this design and get some polyfill code as well. There is a chance that this will
+      be implemented as native function in the future.</p>
+
+    <h2>See Also</h2>
+
+    <ul>
+      <li><a href="https://moderncss.dev/the-3-css-methods-for-adding-element-borders/">https://moderncss.dev/the-3-css-methods-for-adding-element-borders/</a></li>
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+  </main>
+  <script>
+
+    // eslint-disable-next-line no-extend-native
+    Array.prototype.unique = function () { return [...new Set(this)] };
+
+    const arr = [1, 1, 2, 3, 3, 4, 4, 4, 5, 5];
+    console.info('unique:', arr.unique());
+
+    if (typeof Array.prototype.uniqueBy !== 'function') {
+      // eslint-disable-next-line no-extend-native
+      Object.defineProperty(Array.prototype, 'uniqueBy', {
+        writable: true,
+        configurable: true,
+        value: function (f = undefined) {
+          if (!f) { return [...new Set(this)]; }
+          const map = new Map();
+
+          for (const item of this) {
+            const key = f(item);
+            if (!map.has(key)) { map.set(key, item); }
+          }
+
+          return [...map.values()];
+        }
+      });
+    }
+
+    console.info('uniqueBy:', arr.uniqueBy());
+    console.info('uniqueBy:', arr.uniqueBy(x => x));
+
+    const arrComp = [
+      { key: 1, value: 'Horse' },
+      { key: 2, value: 'Dog' },
+      { key: 2, value: 'Dog' },
+      { key: 3, value: 'Cat' }];
+    console.info('uniqueBy:', arrComp.uniqueBy(x => x.key));
+
+  </script>
+</body>
+
+</html>
