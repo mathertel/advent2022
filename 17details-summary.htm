@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Details and Summary HTML Objects</title>
+  <meta name="description" content="Implementing collapsable areas using no code with Details and Summary HTML Objects">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
+
+  <style>
+    summary {
+      cursor: pointer
+    }
+
+    details.v1>summary {
+      list-style: none;
+    }
+
+    details.v2>summary {
+      /* display:block; */
+      list-style-image: url('17red.png');
+
+    }
+
+    details.v2[open]>summary {
+      /* display:block; */
+      list-style-image: url('17green.png');
+      /* list-style-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M10 24l12 12M10 24l12-12M12 24h26' stroke='white' stroke-width='8' stroke-linecap='round' /></svg>"); */
+    }
+
+    details.v3>summary {
+      display: block;
+    }
+
+    details.v3>summary::before {
+      content: '';
+      display: inline-block;
+      height: 1.2em;
+      width: 1.2em;
+      vertical-align: top;
+      border-radius: 50%;
+      margin-right: 0.5em;
+      background: green url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M10 24h28M24 10v28' stroke='white' stroke-width='8' stroke-linecap='round' /></svg>");
+    }
+
+    details.v3[open]>summary::before {
+      background: blue url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M10 24h28' stroke='white' stroke-width='8' stroke-linecap='round' /></svg>");
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Details and Summary HTML Objects</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>Implementing collapsible areas or Accordeons is often implemented with div tags and scripting.
+        But HTML supports some features out of the box in the &lt;details&gt; element.</p>
+    </fieldset>
+
+    <h2>collapsible area</h2>
+
+    <p>Here is the simplest usage of the 2 elements:</p>
+
+    <pre><code>
+&lt;details&gt;
+  &lt;summary&gt;Summary&lt;/summary&gt;
+  &lt;p&gt;This is below the summary tag containing the details content.&lt;/p&gt;
+  &lt;p&gt;Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas ipsum eius adipisci quam
+    aut perspiciatis atque, reiciendis minima rerum quos ad maxime vitae, quidem consequatur praesentium
+    neque ut. Quibusdam, doloribus!&lt;/p&gt;
+&lt;/details&gt;
+    </code></pre>
+
+    <p>that you can try here: </p>
+
+    <div class="playground">
+      <details>
+        <summary>Summary</summary>
+        <p>This is below the summary tag containing the details content.</p>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas ipsum eius adipisci quam aut
+          perspiciatis atque, reiciendis minima rerum quos ad maxime vitae, quidem consequatur praesentium
+          neque ut. Quibusdam, doloribus!</p>
+      </details>
+    </div>
+
+    <h2>Styling</h2>
+
+    <p>To remove the triangle the summary element has to be modified with list-style:none:</p>
+
+    <div class="playground">
+      <details class="v1">
+        <summary>Summary</summary>
+        <p>This is below the summary tag containing the details content.</p>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.
+          Dolorum cumque laudantium maxime saepe quaerat? Nobis eveniet quasi officia amet natus delectus
+          aliquam sequi nemo quisquam, assumenda eum facere! Cumque, quos.</p>
+      </details>
+    </div>
+
+
+    <p>To use other symbols you can use images
+      but with the usual problem on list-style-image is that they do not resize to the line height:</p>
+
+    <pre><code>
+details.v2>summary { list-style-image: url('17red.png'); }
+details.v2[open] > summary { list-style-image: url('17green.png'); }
+    </code></pre>
+
+    <div class="playground">
+      <details class="v2" open>
+        <summary>Summary</summary>
+        <p>This is below the summary tag containing the details content.</p>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.
+          Voluptas ipsum eius adipisci quam aut perspiciatis atque, reiciendis minima rerum
+          quos ad maxime vitae, quidem consequatur praesentium neque ut. Quibusdam, doloribus!</p>
+      </details>
+    </div>
+
+    <p>However a CSS ::before element can be used that allows rich design options:</p>
+
+    <pre><code>
+details.v3>summary {
+  display: block;
+}
+
+details.v3>
+summary::before {
+  content: &apos;&apos;;
+  display: inline-block;
+  height: 1.2em;
+  width: 1.2em;
+  vertical-align: top;
+  border-radius: 50%;
+  margin-right: 0.5em;
+  background: green url(&quot;data:image/svg+xml;utf8,&lt;svg ...
+}
+
+details.v3[open]&gt;summary::before {
+  background: blue url(&quot;data:image/svg+xml;utf8,&lt;svg ...
+}
+</code></pre>
+
+    <div class="playground">
+      <details class="v3" open>
+        <summary>Summary</summary>
+        <p>This is below the summary tag containing the details content.</p>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.
+          Voluptas ipsum eius adipisci quam aut perspiciatis atque, reiciendis minima rerum quos ad maxime vitae,
+          quidem consequatur praesentium neque ut. Quibusdam, doloribus!</p>
+      </details>
+    </div>
+
+    <h2>Smooth options</h2>
+
+    <p>There is a nice article on using animations for the details element at
+      <a href="https://css-tricks.com/how-to-animate-the-details-element/">https://css-tricks.com/how-to-animate-the-details-element/</a>
+      and animations are somehow limited using CSS only.
+    </p>
+
+    <h2>See Also</h2>
+
+    <ul>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details">https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details</a></li>
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-html.htm">HTML</a>
+      <a href="tag-css.htm">CSS</a>
+    </div>
+  </main>
+  <script>
+
+  </script>
+</body>
+
+</html>

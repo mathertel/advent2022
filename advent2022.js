@@ -10,7 +10,7 @@ function codeCopy(evt) {
 }
 
 
-document.querySelectorAll('pre>code').forEach(e => {
+document.querySelectorAll('pre>code,pre.output').forEach(e => {
   e.addEventListener('click', codeCopy);
   // remove any leading and trailing empty lines and spaces
   const c = e.innerHTML;

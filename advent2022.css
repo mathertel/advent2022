@@ -24,12 +24,12 @@ main {
   padding: 2rem 0;
 }
 
-main > p,
-main > ul,
-main > pre {
+main>p,
+main>ul,
+main>div.playground,
+main>pre {
   margin-left: 2rem;
 }
-
 
 *,
 *::before,
@@ -40,8 +40,9 @@ main > pre {
 :root {
   color-scheme: dark light;
   --color: #111111;
-  --back: #eeeeee;
+  --back: #e0e0e0;
   --code: #ffee88;
+  --output: #f8f8f8;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -87,6 +88,12 @@ pre>code:hover::after {
   content: "";
   background-repeat: no-repeat;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M30 36v6H6V18v0h6m6-12h24v24H18z' fill='none' stroke='black' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+
+div.playground,
+pre.output {
+  background-color: var(--output);
+  padding: 0.2em;
 }
 
 a,

@@ -8,6 +8,7 @@
   <title>Clean Javascript</title>
   <meta name="description" content="Setup and use ESLint to create clean Javascript.">
   <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
   <style>
   </style>
 </head>
@@ -38,7 +39,8 @@
 
     <p>The you have to answer some questions and then you go.</p>
 
-    <pre style="background-color: lightgrey;">&gt;npm init @eslint/config
+    <pre class="output">
+&gt;npm init @eslint/config
 
   Need to install the following packages:
   @eslint/create-config@0.4.1
@@ -60,7 +62,8 @@
     <p>package.json:</p>
 
 
-    <pre style="background-color: lightgrey;">{
+    <pre><code>
+{
   "name": "my-project",
   "version": "1.0.0",
   "description": "mnimal browser script linting",
@@ -79,10 +82,12 @@
     "eslint-plugin-promise": "^6.1.1",
     "typescript": "^4.9.4"
   }
-}</pre>
+}
+    </code></pre>
 
     <p>.eslintrc.js:</p>
-    <pre style="background-color: lightgrey;">
+
+    <pre><code>
 module.exports = {
   env: {
     browser: true,
@@ -97,7 +102,8 @@ module.exports = {
   },
   rules: {
   }
-}</pre>
+}
+    </code></pre>
 
     <p>The project is now ready to be analyzed using the eslint command:</p>
 

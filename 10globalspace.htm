@@ -8,6 +8,7 @@
   <title>Variables in the Global Space</title>
   <meta name="description" content="Variables in the Global Space">
   <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
   <style>
   </style>
 </head>
@@ -35,57 +36,67 @@
       This scope is available as an Object using the `globalThis` and in browsers the `window` Object.</p>
 
     <p>In global script blocks in the browser the 3 statements actually do the same:</p>
-    <pre><code>var varBucket = "HelloBucket";
+    <pre><code>
+var varBucket = "HelloBucket";
 window.varBucket = "HelloBucket";
-globalThis.varBucket = "HelloBucket";</code></pre>
+globalThis.varBucket = "HelloBucket";
+    </code></pre>
 
     <p>To test this, just have a look in the console for the output of the following script:</p>
 
-    <pre><code>var varBucket = 'HelloBucket1';
-console.log(varBucket, window.varBucket, globalThis.varBucket,
-  globalThis['varBucket'], eval('varBucket') );
+    <pre><code>
+var varBucket = 'HelloBucket1';
+console.log(varBucket, window.varBucket, globalThis.varBucket, globalThis['varBucket'], eval('varBucket'));
+
 window.varBucket = 'HelloBucket2';
-console.log(varBucket, window.varBucket, globalThis.varBucket,
-  globalThis['varBucket'], eval('varBucket') );
+console.log(varBucket, window.varBucket, globalThis.varBucket, globalThis['varBucket'], eval('varBucket'));
+
 globalThis.varBucket = 'HelloBucket3';
-console.log(varBucket, window.varBucket, globalThis.varBucket,
-  globalThis['varBucket'], eval('varBucket') );</code></pre>
+console.log(varBucket, window.varBucket, globalThis.varBucket, globalThis['varBucket'], eval('varBucket'));
+    </code></pre>
 
     <p>creating the following output in the console:</p>
 
-    <pre style="background-color: lightgrey;">HelloBucket1 HelloBucket1 HelloBucket1 HelloBucket1 HelloBucket1
-  HelloBucket2 HelloBucket2 HelloBucket2 HelloBucket2 HelloBucket2
-  HelloBucket3 HelloBucket3 HelloBucket3 HelloBucket3 HelloBucket3</pre>
+    <pre class="output">
+HelloBucket1 HelloBucket1 HelloBucket1 HelloBucket1 HelloBucket1
+HelloBucket2 HelloBucket2 HelloBucket2 HelloBucket2 HelloBucket2
+HelloBucket3 HelloBucket3 HelloBucket3 HelloBucket3 HelloBucket3
+    </pre>
 
     <h2>The global scope and `let` variables</h2>
 
     <p>A lot of articles on the internet suggest using `let` or `const` instead of `var`.
       Using the same script above with `let` based variable definitions shows that the globalThis object will not reflect these variables:</p>
 
-    <pre><code>let letBucket = 'HelloBucket1';
-console.log(letBucket, window.letBucket, globalThis.letBucket,
-  globalThis['letBucket'], eval('letBucket') );
+    <pre><code>
+let letBucket = 'HelloBucket1';
+console.log(letBucket, window.letBucket, globalThis.letBucket, globalThis['letBucket'], eval('letBucket'));
+
 letBucket = 'HelloBucket2-a';
 window.letBucket = 'HelloBucket2-b';
-console.log(letBucket, window.letBucket, globalThis.letBucket,
-  globalThis['letBucket'], eval('letBucket') );
+console.log(letBucket, window.letBucket, globalThis.letBucket, globalThis['letBucket'], eval('letBucket'));
+
 globalThis.letBucket = 'HelloBucket3';
-console.log(letBucket, window.letBucket, globalThis.letBucket,
-  globalThis['letBucket'], eval('letBucket') );</code></pre>
+console.log(letBucket, window.letBucket, globalThis.letBucket, globalThis['letBucket'], eval('letBucket'));
+</code></pre>
 
     <p>creating the following output in the console:</p>
 
-    <pre style="background-color: lightgrey;">HelloBucket1 undefined undefined undefined HelloBucket1
+    <pre class="output">
+HelloBucket1 undefined undefined undefined HelloBucket1
 HelloBucket1 HelloBucket2 HelloBucket2 HelloBucket2 HelloBucket1
-HelloBucket1 HelloBucket3 HelloBucket3 HelloBucket3 HelloBucket1</pre>
+HelloBucket1 HelloBucket3 HelloBucket3 HelloBucket3 HelloBucket1
+    </pre>
 
     <p>The <code>globalThis</code> is obviously not including these global variables.</p>
+
 
     <h2>List defined global variables</h2>
 
     <p>So the following trick only works for the `var` based variables:</p>
 
-    <pre><code>// analyze all attributes of globalThis
+    <pre><code>
+// analyze all attributes of globalThis
 const keys = {};
 
 const globalThisKeys = Object.keys(globalThis);
@@ -102,7 +113,8 @@ stdWindowKeys.forEach(k => {
   delete keys[k];
 });
 
-console.table(keys);</code></pre>
+console.table(keys);
+     </code></pre>
 
     <p>Have a look to the console output to see the result. Happy debugging...</p>
 
@@ -119,6 +131,7 @@ console.table(keys);</code></pre>
     </div>
   </main>
   <script>
+    // eslint-disable-next-line no-var
     var varBucket = 'HelloBucket1';
     console.log('var-rest');
     console.log(varBucket, window.varBucket, globalThis.varBucket, globalThis['varBucket'], eval('varBucket'));
@@ -128,6 +141,7 @@ console.table(keys);</code></pre>
     console.log(varBucket, window.varBucket, globalThis.varBucket, globalThis['varBucket'], eval('varBucket'));
 
     console.log('let-rest');
+    // eslint-disable-next-line prefer-const
     let letBucket = 'HelloBucket1';
     console.log(letBucket, window.letBucket, globalThis.letBucket, globalThis['letBucket'], eval('letBucket'));
     window.letBucket = 'HelloBucket2';
