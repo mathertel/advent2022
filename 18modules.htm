@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Order of loading scripts and modules</title>
+  <meta name="description" content="[RAW]">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
+  <style>
+  </style>
+  <script>
+    console.info('top-script:', 'start');
+    document.addEventListener('DOMContentLoaded', (_e) => { console.info('doc-DOMContentLoaded event'); });
+    window.addEventListener('DOMContentLoaded', (_e) => { console.info('win-DOMContentLoaded event'); });
+    window.addEventListener('load', (_e) => { console.info('load event'); });
+    console.info('top-script:', 'count scripts=' + document.querySelectorAll('script').length);
+
+    if (location.search.includes('block')) {
+      for (let n1 = 2; n1 >= 0; n1--) {
+        for (let sd = Date.now(); Date.now() < sd + 1000;) { /* wait ? */ }
+        console.info('top-script:', 'countdown:', n1);
+        document.title = `wait for ${n1} secs.`;
+      }
+    }
+
+    console.info('top-script:', 'end');
+  </script>
+
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Order of loading scripts and modules</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>One page to show the loading behavior of scripts and conclusions.</p>
+    </fieldset>
+
+    <p>There are the following script include mechanisms used in this page:</p>
+
+    <ul>
+      <li>A script block 'top-script:' in the &lt;head&gt; in this page</li>
+      <li>A script block 'end-script:' an the end of the &lt;body&gt; in this page</li>
+      <li>A script block of type 'module'</li>
+      <li>A script in an external file included using a untyped &lt;script&gt; tag</li>
+      <li>A script in an external typescript module file</li>
+      <li>A script in an external module imported using the import statement</li>
+    </ul>
+
+    <p>This creates the following output:</p>
+
+    <pre class="output">
+  script: start
+  script: end
+  getPrimes: start
+      getPrimes: end
+  module: start
+  WaitDocument: interactive
+  DOMContentLoaded event
+  module: ready
+  load event
+  module: done
+  </pre>
+
+    <h2>Blocking scripts</h2>
+
+    <p>As expected the script in the header is executed first. When counting the script elements in the document only 2 of them are available so the document is not available completely.</p>
+
+    <p>The script at the end of the body is executed next but again the number of script tags and the document is still incomplete.</p>
+
+    <p>When using the blocking script from <a href="06toplevel-script.htm">06 Top Level Scripting</a> you can see that both script blocks are blocking further loading and activation.</p>
+
+    <p>Using 'async' or 'defer' attributes on these script tags has no effect as defined by the standard.</p>
+
+    <p>You can activate and try this by adding a <a href="?block">?block</a> parameter to the url.</p>
+
+    <p>You will see the counting the console output and that the loading other script blocks and modules are blocked.</p>
+
+    
+    <h2>Module scripts</h2>
+
+    <pre><code>
+&lt;script type=&quot;module&quot;&gt;
+  import { getPrimes } from &apos;./00primes.js&apos;
+  ...
+        </code></pre>
+
+
+    <p>Module script are loaded in an async mode. What can be observed that
+      the imported modules using the ES6 import statement are even executed before the start of the importing script.</p>
+    <p></p>
+
+    <p>When there are async functions in this script (as await is allowed) it may happen that the DOMContentLoaded and load events are
+      dispatched even before the module script terminates. You can activate and try this by adding a <a href="?wait">?wait</a> parameter to the url.</p>
+
+    <p>You will see in the console output that the `module: count` and `module: done` will appear after the `load` event.</p>
+
+
+    <h2>Use Modules after `load` is done</h2>
+
+    <p>Sometimes it is important to be sure that at least the main document has loaded completely.
+      This can be done using the trick from <a href="06toplevel-script.htm">06 Top Level Scripting</a>
+      to execute code by a trigger of the <a href="06toplevel-script.htm">06 Top Level Scripting</a>
+      using <code>window.addEventListener("DOMContentLoaded", async f());</code> but wait...</p>
+
+    <p>Here is a Promise based function that waits for the document to be loaded completely.</p>
+
+    <pre><code>
+// Promise to wait for document loaded completely.
+function WaitDocument() {
+  console.info('WaitDocument:', document.readyState);
+  return new Promise(function (resolve, _reject) {
+    if (document.readyState === 'complete') {
+      resolve();
+    } else {
+      window.addEventListener('load', _e => {
+        console.info('WaitDocument:', document.readyState);
+        resolve();
+      });
+    }
+  });
+}
+          </code></pre>
+
+    <p>This can be used in module scripts by using a single statement: <code>await WaitDocument();</code></p>
+
+    <p>You can activate and try this by adding a <a href="?ready">?ready</a> parameter to the url.</p>
+
+    <p>You will see in the console output that the `module: ready` and following infos will appear after the `load` event.</p>
+
+    <h2>Summary</h2>
+
+    <p>Using top level Scripts are too blocky so converting them into javascript modules is a good option.</p>
+
+    <h2>See Also</h2>
+
+    <ul>
+      <li><a href="06toplevel-script.htm">06 Top Level Scripting</a></li>
+      <li><a href="https://moderncss.dev/the-3-css-methods-for-adding-element-borders/">https://moderncss.dev/the-3-css-methods-for-adding-element-borders/</a></li>
+      <li><a href="https://hacks.mozilla.org/2015/08/es6-in-depth-modules/">https://hacks.mozilla.org/2015/08/es6-in-depth-modules/</a></li>
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+  </main>
+
+  <script async>
+    console.info('end-script:', 'start');
+    console.info('end-script:', 'count scripts=' + document.querySelectorAll('script').length);
+
+    // for (let n1 = 2; n1 >= 0; n1--) {
+    //   for (let sd = Date.now(); Date.now() < sd + 1000;) { /* wait ? */ }
+    //   console.info('end-script:', 'countdown:', n1);
+    //   document.title = `wait for ${n1} secs.`;
+    // }
+
+    console.info('end-script:', 'end');
+  </script>
+
+  <script type="module">
+    console.info('module:', 'start');
+
+    // Promise and Timer used for waiting
+    function WaitPromise(milliSeconds) {
+      return new Promise(function(resolve, _reject) {
+        setTimeout(resolve, milliSeconds);
+      });
+    }
+
+    // Promise to wait for document loaded completely.
+    function WaitDocument() {
+      console.info('WaitDocument:', document.readyState);
+      return new Promise(function(resolve, _reject) {
+        if (document.readyState === 'complete') {
+          resolve();
+        } else {
+          window.addEventListener('load', _e => {
+            console.info('WaitDocument:', document.readyState);
+            resolve();
+          });
+        }
+      });
+    }
+
+    // eslint-disable-next-line import/first
+    import { getPrimes } from './18primes.js';
+
+    if (location.search.includes('ready')) {
+      await WaitDocument();
+      console.info('module:', 'ready', document.readyState);
+    }
+
+    if (location.search.includes('block')) {
+      for (let n1 = 2; n1 >= 0; n1--) {
+        for (let sd = Date.now(); Date.now() < sd + 1000;) { /* wait ? */ }
+        console.info('module:', 'countdown:', n1);
+        document.title = `wait for ${n1} secs.`;
+      }
+    }
+
+    const pl = getPrimes(100);
+    if (location.search.includes('wait')) {
+      await WaitPromise(999);
+    }
+
+    console.info('out:', JSON.stringify(pl));
+    console.info('module:', 'count scripts=' + document.querySelectorAll('script').length);
+    console.info('module:', 'done');
+
+  </script>
+</body>
+
+</html>
