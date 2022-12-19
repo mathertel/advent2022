@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Web Workers Basics</title>
+  <meta name="description" content="[RAW]">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
+  <style>
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Web Workers Basics</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>Scripts must not only be part of the document loaded in the browser. Scripts can also be
+        loaded and launched into <b>Workers</b> and run in the background in a more independent way.</p>
+    </fieldset>
+
+    <p>Workers are supported by all current browsers and provide another possibility on implementing long running processes
+      in a way the do not freeze the UI.</p>
+
+    <p>Here some basic observations.</p>
+
+    <h2>3 types of Workers</h2>
+
+    <p>Be aware that there are multiple kind of background workers actually existing
+      and they provide different functionalities for different purpose.</p>
+
+    <p><b>Worker</b> -- JavaScript executing in parallel to the UI. The communication is done using
+      Events with postMessage and onMessage.</p>
+
+    <p><b>SharedWorker</b> -- JavaScript executing in parallel to the UI that can be used by multiple windows
+      or browser context in parallel. The communication is done using <code>ports</code> and also Events
+      with postMessage and onMessage.</p>
+
+    <p><b>ServiceWorker</b> -- JavaScript background worker that must be installed with agreement of the user.
+      It continues running even when the browser context is closed. It requires a secure context (https).</p>
+
+    <h2>Worker threads</h2>
+
+    <p>Workers run in separate threads so they can execute in parallel to the script that runs in the browser frontend.
+      You can e. g. create a long running calculation in workers.</p>
+
+    <p>Also the way of communication is using an asynchronous pattern by sending messages between the browser script and the worker script.</p>
+
+    <p>Here you see how the 2 independent processes in the browser look like:</p>
+
+    <img src="00workerthreads.png" alt=" Worker threads in debugger">
+
+    <h2>Global Variables</h2>
+
+    <p>As the workers do not run in the Frontend part of the browsers there is no way to access the UI Document objects from a worker.</p>
+
+    <p>The `window` object is not available. Eventually trying to access it throws an ReferenceError. The same is with the `document` object.</p>
+
+    <p>This is a problem with script and libraries that implies that they run in a bowser so don't assume that npm libraries are all working in workers.</p>
+
+
+    <h2>Creating a local Worker</h2>
+
+    <p>To create a Worker a <code>new Worker(url)</code> object can be created. The URL provided
+      will be loaded in for the background thread.</p>
+
+    <p>ZTo create a local worker the script must not be given by a url from the server. Workers can be created
+      also by local URLs using a non parsed script tag containing the worker code:</p>
+
+    <pre><code>
+&lt;script type=&quot;text/js-worker&quot;&gt;
+  // This script WON&apos;T be parsed in teh UI by JS engines because its MIME type is text/js-worker.
+  // it will be loaded into a background worker thread by a local url (see below)
+
+  console.info(&apos;worker:&apos;, &apos;start...&apos;);
+  postMessage(&apos;worker:start&apos;);
+
+  setInterval(function () {
+    postMessage(new Date().toISOString());}, 3000);
+&lt;/script&gt;
+    </code></pre>
+
+    <p>to load the script into the worker the following script does the trick:</p>
+
+    <pre><code>
+// get all script for the worker
+const workerScript =
+  Array.from(document.querySelectorAll(&apos;script[type=\&apos;text\/js-worker\&apos;]&apos;))
+    .map(oScript =&gt; oScript.textContent);
+const blob = new Blob(workerScript, { type: &apos;text/javascript&apos; });
+
+// create a local URL
+const url = window.URL.createObjectURL(blob);
+
+// Creating the worker and make it accessible using the global _worker variable
+_worker = new Worker(url);
+    </code></pre>
+
+    <p>In the following potput you see the current time from the worker in the background
+      passed to the frontendusing a message and event:</p>
+
+    <pre id="logDisplay" class="output">.</pre>
+
+
+    <h2>Next</h2>
+
+    <p>Some more examples will follow on the other worker types and topics.</p>
+
+
+    <h2>See Also</h2>
+
+    <ul>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker">https://developer.mozilla.org/en-US/docs/Web/API/Worker</a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker">https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker</a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker">https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker</a></li>
+
+    </ul>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+  </main>
+
+  <script type="text/js-worker">
+    // This script WON'T be parsed in teh UI by JS engines because its MIME type is text/js-worker.
+    // it will be loaded into a background worker thread by a local url (see below)
+
+    console.info('worker:', 'start...');
+    postMessage('worker:start');
+
+    setInterval(function () {
+      postMessage(new Date().toISOString());}, 3000);
+  </script>
+
+
+  <script type="text/javascript">
+    // This script WILL be parsed by JS engines because its MIME type is text/javascript.
+    // it collects all scripts for a worker process.
+    var _worker;
+
+    function pageLog(sMsg) {
+      // Use a fragment: browser will only render/reflow once.
+      const oFragment = document.createDocumentFragment();
+      oFragment.appendChild(document.createTextNode(sMsg));
+      oFragment.appendChild(document.createElement('br'));
+      document.querySelector('#logDisplay').appendChild(oFragment);
+    }
+
+    window.addEventListener('DOMContentLoaded', (_e => {
+      // get all script for the worker
+      const workerScript =
+        Array.from(document.querySelectorAll('script[type=\'text\/js-worker\']')).map(oScript => oScript.textContent);
+      const blob = new Blob(workerScript, { type: 'text/javascript' });
+
+      // create a local URL
+      const url = window.URL.createObjectURL(blob);
+
+      // Creating the worker and make it accessible using the global _worker variable
+      _worker = new Worker(url);
+
+      // capture all messages from the worker and send to consoles
+      _worker.addEventListener('message', (evt) => {
+        pageLog('Message: ' + evt.data);
+      });
+
+    }));
+  </script>
+
+</body>
+
+</html>
