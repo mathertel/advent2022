@@ -73,12 +73,14 @@ code {
   padding: 0 0.2em;
 }
 
+pre.output,
 pre>code {
   position: relative;
   display: block;
   padding: 0.4em;
 }
 
+pre.output:hover::after,
 pre>code:hover::after {
   position: absolute;
   top: 0;

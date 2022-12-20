@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Key and certificate for https on localhost</title>
+  <meta name="description" content="Key and certificate for https on localhost">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
+  <style>
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Key and certificate for https on localhost</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>For using https protocol on a local server a key and certificate file must be created.</p>
+    </fieldset>
+
+    <p>The steps to do:</p>
+
+    <ol>
+      <li>Install openssl</li>
+      <li>Create your own rootCA with key & certificates</li>
+      <li>Install the rootCA certificate</li>
+      <li>Create key & certificate for localhost</li>
+      <li>Sign the localhost certificate using the rootCA</li>
+    </ol>
+
+    <p>Here are brief instructions:</p>
+
+    <h2>Install openssl</h2>
+
+    <p>The OpenSSL project <a href="https://www.openssl.org/">https://www.openssl.org/</a>
+      does not distribute any code in binary form
+      but in the <a href="https://wiki.openssl.org/">openssl wiki</a> there is a page where to find
+      binaries built by the community: <br>
+      <a href="https://wiki.openssl.org/index.php/Binaries">https://wiki.openssl.org/index.php/Binaries</a>
+
+    <p>Download the OpenSSL for windows or other OS and install from there only.</p>
+    <p>There is a ask for supporting the openSSL by spending some money at the end of some installations that can be disabled.</p>
+    </p>
+
+    <p>These scripts create all you need for a 'localhost' server.
+      Of course you can change your name (mathertel.de) country (DE) and city (Frankfurt) to your own.</p>
+
+
+    <h2>Create your own rootCA</h2>
+
+    <p>Creating a own CA (Trusted Root Certification Authority) simplifies the setup of further using multiple servers in your personaL (development) environment.</p>
+
+    <p>This script creates a 2048 bit rootCA key file and a self-signed certificate.
+      You don't have to repeat this often as the rootCA has a long lifetime of 10 years (3560 days).</p>
+
+    <pre><code style="white-space: pre-wrap;padding-left: 2em;text-indent: -2em;">
+openssl req -x509 -sha256 -days 3560 -nodes -newkey rsa:2048 -subj "/CN=mathertel.de/C=DE/L=Frankfurt" -keyout rootCA.key -out rootCA.crt
+    </code></pre>
+
+    <p>This will create 2 files: <b>rootCA.crt</b> and <b>rootCA.key</b> that you should keep save and readonly (for the next 10 years).</p>
+
+    <h2>Install the rootCA certificate</h2>
+
+    <p>The root certificate <b>rootCA.crt</b> should be added to the trusted certification store in the section "Trusted Root Certification Authority".</p>
+
+
+    <h2>Create the key</h2>
+
+    <p>The following command will create the private key for localhost.</p>
+
+    <pre><code>
+openssl genrsa -out localhost.key 
+    </code></pre>
+
+    <p>This will create the file: <b>localhost.key</b>.</p>
+    <p>The only place for this file to stay should be your server in a secure place and should not be reachable or downloadable from the outside.</p>
+
+
+    <h2>Create unsigned certificate (CSR)</h2>
+
+    <p>A certifcate will contain details about the server so using 'localhost' in the Common Name (CN) is required. The other dn-attributes can be changed.</p>
+    <p>(CSR is for 'Certificate Signing Request')</p>
+    <p>The other parameters are best practice or requzired for tls certificates. They together can be kept in a configuration file <b>localhost-csr.conf</b>:</p>
+
+    <pre class="output">
+[ req ]
+default_bits = 2048
+prompt = no
+default_md = sha256
+req_extensions = req_ext
+distinguished_name = dn
+
+[ dn ]
+C = DE
+L = Frankfurt
+CN = localhost
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+IP.1 = 127.0.0.1
+    </pre>
+
+    <p>To create the unsigned certificate use the following command:</p>
+
+    <pre><code>openssl req -new -key localhost.key -out localhost.csr -config localhost-csr.conf</code></pre>
+
+    <p>This will create the file: <b>localhost.key</b>.</p>
+
+
+    <h2>Signing the certificate</h2>
+
+    <p>For this step again a configuration file is helpful <b>localhost-crt.conf</b>:</p>
+
+    <pre class="output">
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = localhost
+IP.1 = 127.0.0.1
+    </pre>
+
+    <p>To create a signed certificate use the following command:</p>
+
+    <pre><code style="white-space: pre-wrap;padding-left: 2em;text-indent: -2em;">
+openssl x509 -req -in localhost.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out localhost.crt -days 2000 -sha256 -extfile localhost-crt.conf
+    </code></pre>
+
+    <p>This will create the file: <b>localhost.crt</b> that will be available to the public for verification tasks.</p>
+
+    <p>To verify the just created certificates you can use:</p>
+
+    <pre><code style="white-space: pre-wrap;padding-left: 2em;text-indent: -2em;">
+  openssl verify -verbose -CAfile rootCA.crt localhost.crt
+</code></pre>
+
+
+    <h2>Next</h2>
+
+    <p>The 2 files <b>localhost.crt</b> and <b>localhost.key</b> can be used for running a secure servers
+    like live server or nodejs express based servers.</p>
+
+    <p>Using https as the protocol (not http) is required for several features in the browser including workers...</p>
+
+
+    <h2>See Also</h2>
+
+    <ul>
+      <li><a href="https://www.openssl.org/">https://www.openssl.org/</a></li>
+      <li><a href="https://wiki.openssl.org/index.php/Binaries">https://wiki.openssl.org/index.php/Binaries</a></li>
+      <li><a href="https://slproweb.com/products/Win32OpenSSL.html">https://slproweb.com/products/Win32OpenSSL.html</a></li>
+      <li><a href="https://devopscube.com/create-self-signed-certificates-openssl/">https://devopscube.com/create-self-signed-certificates-openssl/</a></li>
+      <li><a href="https://www.linkedin.com/pulse/how-create-your-own-self-signed-root-certificate-shankar-gomare/ </ul>">https://www.linkedin.com/pulse/how-create-your-own-self-signed-root-certificate-shankar-gomare/
+    </ul>
+
+    <!-- <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+      <a href="tag-css.htm">CSS</a>
+    </div> -->
+  </main>
+  <script>
+
+  </script>
+</body>
+
+</html>
