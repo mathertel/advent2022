@@ -1,0 +1,219 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Service Workers Basics</title>
+  <meta name="description" content="Use Service Workers for caching web requests.">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Service Workers Basics</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>Service Workers are another kind of worker scripts in the background.
+        They can interesect any network requests for the given domain and path
+        and can provide caching.</p>
+    </fieldset>
+
+
+    <h2>Use a secure server</h2>
+
+    <p>Service Workers require using the https protocol. To create a key and certificate
+      you can follow the instructions in the yesterdays story:
+      <a href="21certs.htm">21 Key and certificate for https on localhost</a>.
+    </p>
+
+    <p>Then add these to your server and enable using https.
+      For simple experiments you can use the `liveserver`
+      but the demo here at github.io also works and you can at least follow the implementation.</p>
+
+    <h2>Register</h2>
+
+    <p>Service Workers are ^bound to a given domain (and path) and are not bound to a web page.
+      They will continue executing even after navigating away from the domain.</p>
+
+    <p>Starting a Service Worker is done by registering a URL for a javascript file:</p>
+
+    <pre><code>
+await navigator.serviceWorker.register('worker.js');
+  </code></pre>
+
+    <p>The script will be loaded and executed async and the events will happen.
+      By using the <code>navigator.serviceWorker</code>
+      object some methors are available to control the service in the background.</p>
+
+
+    <h2>Implementing a Service Worker</h2>
+
+    <p>In the javascript file you will setup the worker and listen to events.
+      The following events are the most important:</p>
+
+    <p><b>install</b> -- This event can be used for pre-loading or cleanup of the cache.</p>
+
+    <p><b>activate</b> -- When the service worker is activated.
+      You should call <code>self.clients.claim();</code>
+      to enable all actually running pages (including the current) page to use the service worker.</p>
+
+    <p><b>fetch</b> -- This event will be used to inform about that the current page executes a fetch().
+      Here caching can be implemented.</p>
+
+    <p>Here is a basic Service Worker for strong caching of several files but not services:</p>
+
+    <pre><code>
+// Service Worker implementation for caching static data
+// of type *.htm, *.js', *.css', *.ico'
+// bot not *.json or other services
+
+const cacheName = 'pwa-v2';
+
+const cacheFileTypes = new Set([
+  'htm', 'js', 'css', 'ico', 'pdf'
+]);
+
+const cachePreloadFiles = [
+  'advent2022.css',
+  'advent2022.js'
+];
+
+
+self.addEventListener('install', (evt) => {
+  console.log('sw:install...');
+  evt.waitUntil(
+    caches.open(cacheName)
+      .then(cache => {
+        console.log('sw:delete...');
+        cache.delete('/favicon.ico');
+        return (cache);
+      })
+      .then(cache => {
+        console.log('sw:add...');
+        return (cache.addAll(cachePreloadFiles));
+      })
+  );
+});
+
+
+self.addEventListener('activate', (_evt) => {
+  console.log('sw:activated.');
+  self.clients.claim();
+});
+
+
+// Try for a cached ressource and add response to the Cache.
+async function tryAddCache(req) {
+  console.log('try:', req.url);
+  let response = await caches.match(req);
+
+  if (response) {
+    console.log('sw:fromCache', req.url);
+  } else {
+    console.log('sw:fetch', req.url);
+    response = await fetch(req);
+    const cl = response.clone();
+    caches.open(cacheName)
+      .then(cache => {
+        console.log('sw:toCache', req.url);
+        cache.put(req, cl);
+      });
+  }
+  return response;
+};
+
+
+self.addEventListener('fetch', (evt) => {
+  const req = evt.request;
+  const url = new URL(evt.request.url);
+  const path = url.pathname;
+  console.log('sw:request', req.mode, path);
+
+  const pos = path.lastIndexOf('.');
+
+  // caching allowed ?
+  if ((pos >= 0) && (cacheFileTypes.has(path.substring(pos + 1).toLowerCase()))) {
+    const res = tryAddCache(req);
+    console.log('sw:response', res);
+    evt.respondWith(res);
+
+  } else {
+    // default fetch procedure...
+  }
+});
+
+
+// End.
+    </code></pre>
+
+    <h2>Implementation hints</h2>
+
+    <p>This is only one step towards pwa applications but an important one.</p>
+
+    <p>To see registerend and running Service Workers in your browser open the url
+      <code>edge://serviceworker-internals/</code> (or similar).
+      This list has some useful functionality to stop and unregister service workers.
+      You may need while development.
+    </p>
+
+    <p>Do not enable caching while you implement. It my hurt.</p>
+
+    <p>In <code>edge://serviceworker-internals/</code> you can find the "inspect" button
+      that can be used to start a debugger for a specific Service Worker
+      and see the console output.</p>
+
+    <h2>See Also</h2>
+
+    <ul>
+      <li><a href="20workerbasics.htm">20 Web Workers Basics</a></li>
+      <li><a href="21certs.htm">21 create Key and certificate for https on localhost</a></li>
+      <li><a href="https://w3c.github.io/ServiceWorker">https://w3c.github.io/ServiceWorker</a></li>
+      <li><a href="https://riptutorial.com/javascript/example/11067/a-simple-service-worker">https://riptutorial.com/javascript/example/11067/a-simple-service-worker</a></li>
+      <li><a href="https://developer.chrome.com/docs/workbox/caching-strategies-overview/">https://developer.chrome.com/docs/workbox/caching-strategies-overview/</a></li>
+    </ul>
+
+
+    <h2>Tags</h2>
+
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+
+    <script type="module" class="sp-script">
+      try {
+        await navigator.serviceWorker.register('22sw.js');
+        console.info('register:done.');
+
+      } catch (err) {
+        console.error('register:failed.', err);
+      }
+
+      console.info('start fetching data...');
+
+      // get some data every 5 seconds...
+      window.setInterval(async () => {
+        fetch('22mockdata', {
+          header: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(r => r.json())
+          .then(j => {
+            console.info('data:', j);
+          });
+      }, 5000);
+    </script>
+  </main>
+</body>
+
+</html>
