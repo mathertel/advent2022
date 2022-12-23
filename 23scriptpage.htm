@@ -1,0 +1,129 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Script Tester</title>
+  <meta name="description" content="Use Service Workers for caching web requests.">
+
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="23scriptpage.css">
+  <script src="23scriptpage.js"></script>
+
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
+
+  <style> </style>
+  <script> </script>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Script Page</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>This page is a playground to run javascript in the context of the browser.
+        To use it for exploring the features and add documentation and console logs
+        on one page that can be printed.</p>
+    </fieldset>
+
+    <p>The page here contains a script block that is made visible.</p>
+    <p>All console output from the script is captured and displayed beyond.</p>
+
+    <p>It uses some of the techniques of the advent stories of this year:</p>
+    <ol>
+      <li value="03"><a href="03coalescing.htm">Implementing default values for function parameters</a></li>
+      <li value="05"><a href="05logging.htm">Standard console.logging</a></li>
+      <li value="06"><a href="06toplevel-script.htm">Top Level Scripting</a></li>
+      <li value="08"><a href="08logging-filter.htm">Filtering console.logging</a></li>
+      <li value="10"><a href="10globalspace.htm">Variables in the Global Space</a></li>
+      <li value="17"><a href="17details-summary.htm">Details and Summary HTML Objects</a></li>
+    </ol>
+
+    <p>Have a look into the implementation using the ctrl-u shortcut to view the page source
+      and navigate into the files <code>23scriptpage.js</code> and <code>23scriptpage.css</code>.</p>
+
+    <p>Happy debugging ...</p>
+
+    <h2>Buttons</h2>
+    <p>
+      <button id="perm">AskPerm</button>
+      <button id="clearperm">ClearPem</button>
+    </p>
+
+    <h2>Script & Log</h2>
+    <pre style="display:none">
+    // https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID
+    // console.log(window.crypto.randomUUID());
+    </pre>
+
+    <script class="sp-script" editable>
+      const notifies = [];
+      console.groupCollapsed('Feature Test');
+      console.log('URLPattern:', 'URLPattern' in globalThis);
+      console.log('PushManager:', 'PushManager' in window);
+      console.log('Notification:', 'Notification' in window);
+      console.info('state:', Notification.permission);
+      console.groupEnd();
+
+      console.group('Test-Groups');
+      console.log('before');
+      console.group('Nest');
+      console.log('Text - log');
+      console.info('Text - info:');
+      console.warn('Text - warn:');
+      console.error('Text - error:');
+      console.groupEnd();
+      console.log('after');
+      console.groupEnd();
+
+      console.groupCollapsed('globalThis Properties');
+      const t = {};
+      const props = Object.keys(globalThis);
+      props.forEach(k => {
+        t[k] = Object.assign(t[k] || { key: k, type: typeof globalThis[k] });
+      });
+      console.table(Object.values(t), ['key', 'type']);
+      console.groupEnd();
+
+
+      document.querySelector('#perm').addEventListener('click', _evt => {
+        console.log('ask');
+
+        // https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API/Using_the_Notifications_API
+        Notification.requestPermission()
+          .then(permission => {
+            console.log('The user gave:', permission);
+          });
+
+        window.setTimeout(_e => {
+          const n = new Notification('Hello World!', {
+            body: 'I like to ask'
+          });
+          notifies.push(n);
+
+          const n2 = new Notification('Hello World!', {
+            body: 'I like to ask again'
+          });
+          notifies.push(n2);
+        }, 800);
+      });
+
+      document.querySelector('#clearperm').addEventListener('click', _evt => {
+        notifies.forEach(n => n.close());
+      });
+
+    </script>
+
+  </main>
+
+</body>
+
+</html>

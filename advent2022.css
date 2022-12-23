@@ -26,8 +26,10 @@ main {
 
 main>p,
 main>ul,
+main>ol,
 main>div.playground,
-main>pre {
+main>pre,
+main>script.sp-script {
   margin-left: 2rem;
 }
 
@@ -74,14 +76,16 @@ code {
 }
 
 pre.output,
-pre>code {
+pre>code,
+script.sp-script {
   position: relative;
   display: block;
   padding: 0.4em;
 }
 
 pre.output:hover::after,
-pre>code:hover::after {
+pre>code:hover::after,
+script.sp-script:hover::after {
   position: absolute;
   top: 0;
   right: 0;

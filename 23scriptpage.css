@@ -1,0 +1,103 @@
+/* stylesheet for displaying script blocks and logs in pages */
+
+script.sp-script,
+pre.sp-log {
+  display: block;
+  white-space: pre;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.8rem;
+  xmargin: 0.5rem 0;
+  xpadding: 0 0.5em;
+}
+
+script.sp-script::before,
+pre.sp-log::before {
+  display: block;
+  padding-bottom: 0.5rem;
+  /* margin: 0 -0.5em; */
+}
+
+script.sp-script {
+  background-color: lightyellow;
+}
+
+.sp-log div.info {
+  color: blue;
+}
+
+.sp-log div.warn {
+  background-color: yellow;
+}
+
+.sp-log div.error {
+  background-color: lightsalmon;
+}
+
+.sp-log div.group {
+  border-left: 2px solid darkblue;
+  padding-left: 0.5em;
+  max-height: 1rem;
+  overflow: hidden;
+}
+
+.xsp-log details {
+  /* max-height: unset; */
+  /* margin-left: 1em; */
+  border: 1px solid darkblue;
+}
+
+.xsp-log summary {
+  font-weight: bold;
+  color: darkblue;
+  margin-left: -1em;
+}
+
+
+.sp-log details {
+  border-left: 0.2em solid darkblue;
+  padding-left: 1.4em;
+}
+
+.sp-log summary {
+  display: block;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.sp-log summary::before {
+  content: '';
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  margin-left: -1.2em;
+  vertical-align: top;
+  margin-right: 0.2em;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M10 10 L 38 24 L 10 38' stroke='darkblue' stroke-width='8' stroke-linecap='round' /></svg>");
+  transform: rotate(0);
+  transition: transform 0.2s;
+}
+
+.sp-log details[open]>summary::before {
+  transform: rotate(90deg);
+}
+
+
+/* pretty text and tables */
+
+pre.sp-log>h4 {
+  margin: 0;
+}
+
+table {
+  border: 1px solid gray;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 2px solid gray;
+}
+
+th {
+  background-color: #eeeeee;
+}

@@ -15,6 +15,7 @@ const cachePreloadFiles = [
 
 
 self.addEventListener('install', (evt) => {
+  self.skipWaiting();
   console.log('sw:install...');
   evt.waitUntil(
     caches.open(cacheName)
