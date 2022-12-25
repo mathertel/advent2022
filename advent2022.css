@@ -29,6 +29,7 @@ main>ul,
 main>ol,
 main>div.playground,
 main>pre,
+main>table,
 main>script.sp-script {
   margin-left: 2rem;
 }

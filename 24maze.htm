@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Maze Algorithms Create and Solve</title>
+  <meta name="description" content="Algorithms to create and solve maze puzzles.">
+  <link Content-Type="text/css" href="./advent2022.css" rel="stylesheet" />
+  <script src="./advent2022.js" defer></script>
+  <style>
+    #mazeTable {
+      table-layout: fixed;
+      empty-cells: show;
+      border-collapse: collapse;
+      border: darkblue 0.2em solid;
+      margin-left: 2em;
+    }
+
+    td {
+      width: 1em;
+      height: 1em;
+    }
+
+    td.WS {
+      border-bottom: #444444 2px solid;
+    }
+
+    td.WSE {
+      border-bottom: #444444 2px solid;
+      border-right: #444444 2px solid;
+    }
+
+    td.WE {
+      border-right: #444444 2px solid;
+    }
+
+
+    td.USED {
+      background-color: white;
+    }
+
+    td.START {
+      background-color: green;
+    }
+
+    td.END {
+      background-color: red;
+    }
+
+    td.WAY {
+      background-color: lime;
+    }
+
+    td.BAD {
+      background-color: Gold;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="back" href="javascript:history.back()"></a>
+    <h1>Maze Algorithms Create and Solve</h1>
+
+    <fieldset>
+      <legend>Excerpt</legend>
+      <p>This page contains a Maze Algorithm that creates a maze with exactly one path wetween two points
+        and illustrates this using html to display the maze an a Tracking Algorithm to show how to solve.</p>
+    </fieldset>
+
+    <p>This was created many years ago on .net using c# and javascript for IE5. Porting it to current the JavaScript version was possible in a few hours.</p>
+
+    <p>Have much fun debugging...</p>
+
+    <h2>Example</h2>
+
+    <table id='mazeTable'>
+    </table>
+
+    <p>Click <button id='doStart'>Start Resolving</button> to start resolving the maze. when steps get slow, just click somewhere on the page.</p>
+
+    <script type="module">
+      /** @type HTMLTableElement */
+      const maze = document.querySelector('#mazeTable');
+
+      /** @type HTMLTableCellElement[][] */
+      const cells = []; // 2 dim array of cells to simplify addressing.
+
+      const url = new URL(window.location.href);
+      const mazeHeight = url.searchParams.get('height') ?? 20;
+      const mazeWidth = url.searchParams.get('width') ?? 32;
+
+      /**
+       * Check for a position to be valid in the maze.
+       * @param {number} x x position
+       * @param {number} y y position
+       * @return {boolean} Returns true, if the position is inside the mazemap.</returns>
+       */
+      function validPosition(x, y) {
+        return ((x >= 0) && (x < mazeWidth) && (y >= 0) && (y < mazeHeight));
+      }
+
+      function createPos(x, y) {
+        return ({ x, y });
+      }
+
+      // Algorithm to create the maze table
+      (() => {
+        // create maze table and data array to cells
+        for (let y = 0; y < mazeHeight; y++) {
+          const r = maze.insertRow();
+          cells[y] = [];
+          for (let x = 0; x < mazeWidth; x++) {
+            const c = r.insertCell();
+            cells[y][x] = c;
+            c.className = 'WS WE';
+          }
+        }
+        cells[0][0].classList.add('START');
+        cells[mazeHeight - 1][mazeWidth - 1].classList.add('END');
+
+        const hereX = Math.floor(Math.random() * (mazeWidth - 2)) + 1;
+        const hereY = Math.floor(Math.random() * (mazeHeight - 2)) + 1;
+        cells[hereY][hereX].classList.add('USED');
+        exploreAll(hereX, hereY);
+
+        /**
+         * Check for a position not be used.
+         * @param {number} x x position
+         * @param {number} y y position
+         * @return {boolean} Returns true, if the position is inside the mazemap.</returns>
+         */
+        function unUsed(x, y) {
+          const c = cells[y][x];
+          return (!c.classList.contains('USED'));
+
+        }
+
+        // find a unused neighbor and extend the open maze
+        function explore(x, y) {
+          const terrain = [];
+          let newPos;
+
+          // up
+          if (validPosition(x, y - 1) && unUsed(x, y - 1)) {
+            terrain.push({ x, y: y - 1 });
+          }
+
+          // right
+          if (validPosition(x + 1, y) && unUsed(x + 1, y)) {
+            terrain.push({ x: x + 1, y });
+          }
+
+          // down
+          if (validPosition(x, y + 1) && unUsed(x, y + 1)) {
+            terrain.push({ x, y: y + 1 });
+          }
+
+          // left
+          if (validPosition(x - 1, y) && unUsed(x - 1, y)) {
+            terrain.push({ x: x - 1, y });
+          }
+
+          // choose one
+          if (terrain.length > 0) {
+            // choose a random unvisited neighbor
+            const n = Math.floor(Math.random() * terrain.length);
+            newPos = terrain[n];
+
+            // break down the wall
+            if (newPos.y === y - 1) { // up
+              cells[y - 1][x].classList.remove('WS');
+
+            } else if (newPos.x === x + 1) { // right
+              cells[y][x].classList.remove('WE');
+
+            } else if (newPos.y === y + 1) { // down
+              cells[y][x].classList.remove('WS');
+
+            } else if (newPos.x === x - 1) { // left
+              cells[y][x - 1].classList.remove('WE');
+            } // if
+            cells[newPos.y][newPos.x].classList.add('USED');
+          } // if
+          return (newPos);
+        } // explore
+
+
+        function exploreAll(x, y) {
+          let newPos = explore(x, y);
+
+          while (newPos) {
+            exploreAll(newPos.x, newPos.y);
+            newPos = explore(x, y);
+          }
+        }
+      })();
+
+      let here = createPos(0, 0);
+      cells[0][0].classList.add('WAY');
+
+      let isRunning = false;
+
+      document.querySelector('#doStart').addEventListener('click', startStopResolver);
+
+      function startStopResolver() {
+        if (isRunning) {
+          isRunning = false;
+        } else {
+          isRunning = true;
+          onTimer();
+        }
+      }
+
+      function onTimer() {
+        nextStep();
+        if (isRunning) {
+          window.setTimeout(onTimer, 20);
+        }
+      }
+
+
+      function nextStep() {
+        // find a unvisited neighbor cell or step back on the way
+
+        let next; // can move on
+        let back; // must move back
+
+        // can step up ?
+        if ((!next) && (validPosition(here.x, here.y - 1))) {
+          const step = cells[here.y - 1][here.x];
+          const stepPos = createPos(here.x, here.y - 1);
+          if (step.classList.contains('WS') || step.classList.contains('BAD')) {
+            // blocked.
+          } else if (step.classList.contains('END')) {
+            isRunning = false;
+            return;
+          } else if (step.classList.contains('WAY')) {
+            back = stepPos;
+          } else {
+            next = stepPos;
+          } // if
+        } // if
+
+        // can step right ?
+        if ((!next) && (validPosition(here.x + 1, here.y))) {
+          const step = cells[here.y][here.x + 1];
+          const stepPos = createPos(here.x + 1, here.y);
+
+          if (cells[here.y][here.x].classList.contains('WE') || step.classList.contains('BAD')) {
+            // blocked.
+          } else if (step.classList.contains('END')) {
+            isRunning = false;
+            return;
+          } else if (step.classList.contains('WAY')) {
+            back = stepPos;
+          } else {
+            next = stepPos;
+          } // if
+        } // if
+
+        // can step down ?
+        if ((!next) && (validPosition(here.x, here.y + 1))) {
+          const step = cells[here.y + 1][here.x];
+          const stepPos = createPos(here.x, here.y + 1);
+
+          if (cells[here.y][here.x].classList.contains('WS') || step.classList.contains('BAD')) {
+            // blocked.
+          } else if (step.classList.contains('END')) {
+            isRunning = false;
+            return;
+          } else if (step.classList.contains('WAY')) {
+            back = stepPos;
+          } else {
+            next = stepPos;
+          } // if
+        } // if
+
+        // can step left ?
+        if ((!next) && (validPosition(here.x - 1, here.y))) {
+          const step = cells[here.y][here.x - 1];
+          const stepPos = createPos(here.x - 1, here.y);
+
+          if (step.classList.contains('WE') || step.classList.contains('BAD')) {
+            // blocked.
+          } else if (step.classList.contains('END')) {
+            isRunning = false;
+            return;
+          } else if (step.classList.contains('WAY')) {
+            back = stepPos;
+          } else {
+            next = stepPos;
+          } // if
+        } // if
+
+        if (next != null) {
+          // step there
+          here = next;
+          cells[here.y][here.x].classList.add('WAY');
+        } else {
+          // step back
+          cells[here.y][here.x].classList.remove('WAY');
+          cells[here.y][here.x].classList.add('BAD');
+          here = back;
+        }
+      } // nextStep
+    </script>
+
+    <h2>Tags</h2>
+    <div class="taglist">
+      <a href="tag-js.htm">JavaScript</a>
+    </div>
+  </main>
+  <script>
+
+  </script>
+</body>
+
+</html>
